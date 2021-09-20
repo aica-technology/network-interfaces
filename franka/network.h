@@ -1,0 +1,230 @@
+#pragma once
+
+#include <clproto.h>
+#include <state_representation/space/cartesian/CartesianState.hpp>
+#include <state_representation/robot/JointState.hpp>
+#include <state_representation/robot/Jacobian.hpp>
+#include <state_representation/parameters/Parameter.hpp>
+#include <zmq.hpp>
+
+namespace network_interfaces::franka {
+
+// TODO
+/**
+ * @enum ControlType
+ * @brief An enumeration of the possible control types in Cartesian and joint space.
+ */
+enum ControlType {
+  NONE = 0
+};
+
+/**
+ * @struct StateMessage
+ * @brief A collection of state variables in Cartesian and joint space that the robot publishes.
+ */
+struct StateMessage {
+  state_representation::CartesianState ee_state;
+  state_representation::JointState joint_state;
+};
+
+/**
+ * @struct CommandMessage
+ * @brief A collection of state variables in Cartesian and joint space that the robot
+ * follows according to the specified control type.
+ * @see ControlType
+ */
+struct CommandMessage {
+  state_representation::CartesianState ee_state;
+  state_representation::JointState joint_state;
+};
+
+// --- Encoding methods --- //
+
+/**
+ * @brief Encode a state message into the serialized binary format.
+ * @param state The StateMessage to encode
+ * @return An ordered vector of encoded strings representing the state message fields
+ */
+inline std::vector<std::string> encode_state(const StateMessage& state) {
+  std::vector<std::string> encoded_state;
+  encoded_state.emplace_back(clproto::encode(state.ee_state));
+  encoded_state.emplace_back(clproto::encode(state.joint_state));
+  return encoded_state;
+}
+
+/**
+ * @brief Encode a command message into the serialized binary format.
+ * @param state The CommandMessage to encode
+ * @return An ordered vector of encoded strings representing the command message fields
+ */
+inline std::vector<std::string> encode_command(const CommandMessage& command) {
+  std::vector<std::string> encoded_command;
+  encoded_command.emplace_back(clproto::encode(command.ee_state));
+  encoded_command.emplace_back(clproto::encode(command.joint_state));
+  return encoded_command;
+}
+
+// --- Decoding methods --- //
+
+/**
+ * @brief Decode a state message from the serialized binary format.
+ * @param message An ordered vector of encoded strings representing the state message fields
+ * @return The equivalent StateMessage
+ */
+inline StateMessage decode_state(const std::vector<std::string>& message) {
+  StateMessage state;
+  state.ee_state = clproto::decode<state_representation::CartesianState>(message.at(0));
+  state.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
+  return state;
+}
+
+/**
+ * @brief Decode a command message from the serialized binary format.
+ * @param message An ordered vector of encoded strings representing the command message fields
+ * @return The equivalent CommandMessage
+ */
+inline CommandMessage decode_command(const std::vector<std::string>& message) {
+  CommandMessage command;
+  command.ee_state = clproto::decode<state_representation::CartesianState>(message.at(0));
+  command.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
+  return command;
+}
+
+// --- Configuration methods --- //
+
+/**
+ * @brief Configure the zmq subscriber socket to receive messages.
+ * @param context The ZMQ context object
+ * @param[in,out] subscriber The subscription socket that is used to receive messages
+ * @param subscriber_uri The URI (IP:Port) of the network socket
+ * @param bind_subscriber Optional flag to decide if subscriber should bind or connect
+ */
+inline void configure_subscriber(
+    zmq::context_t& context, zmq::socket_t& subscriber, const std::string& subscriber_uri, bool bind_subscriber = false
+) {
+  subscriber = zmq::socket_t(context, ZMQ_SUB);
+  subscriber.set(zmq::sockopt::conflate, 1);
+  subscriber.set(zmq::sockopt::subscribe, "");
+  if (bind_subscriber) {
+    subscriber.bind("tcp://" + subscriber_uri);
+  } else {
+    subscriber.connect("tcp://" + subscriber_uri);
+  }
+}
+
+/**
+ * @brief Configure the zmq subscriber socket to publish messages.
+ * @param context The ZMQ context object
+ * @param[in,out] publisher The publication socket that is used to send messages
+ * @param publisher_uri The URI (IP:Port) of the network socket
+ * @param bind_publisher Optional flag to decide if publisher should bind or connect
+ */
+inline void configure_publisher(
+    zmq::context_t& context, zmq::socket_t& publisher, const std::string& publisher_uri, bool bind_publisher = true
+) {
+  publisher = zmq::socket_t(context, ZMQ_PUB);
+  if (bind_publisher) {
+    publisher.bind("tcp://" + publisher_uri);
+  } else {
+    publisher.connect("tcp://" + publisher_uri);
+  }
+}
+
+/**
+ * @brief Configure the zmq sockets to publish and receive messages.
+ * @param context The ZMQ context object
+ * @param[in,out] subscriber The subscription socket that is used to receive messages
+ * @param subscriber_uri The URI (IP:Port) of the subscribing network socket
+ * @param[in,out] publisher The publication socket that is used to send messages
+ * @param publisher_uri The URI (IP:Port) of the publishing network socket
+ * @param bind_subscriber Optional flag to decide if subscriber should bind or connect
+ * @param bind_publisher Optional flag to decide if publisher should bind or connect
+ */
+inline void configure_sockets(
+    zmq::context_t& context, zmq::socket_t& subscriber, const std::string& subscriber_uri, zmq::socket_t& publisher,
+    const std::string& publisher_uri, bool bind_subscriber, bool bind_publisher
+) {
+  configure_subscriber(context, subscriber, subscriber_uri, bind_subscriber);
+  configure_publisher(context, publisher, publisher_uri, bind_publisher):
+}
+
+// --- Transceiving methods --- //
+
+/**
+ * @brief Send a sequence of encoded field messages.
+ * @param fields An ordered vector of encoded fields
+ * @param publisher The configured ZMQ publisher socket
+ * @return True if the state was published, false otherwise
+ */
+inline bool send(const std::vector<std::string>& fields, zmq::socket_t& publisher) {
+  zmq::message_t message(fields.size() * CLPROTO_PACKING_MAX_FIELD_LENGTH);
+  clproto::pack_fields(fields, static_cast<char*>(message.data()));
+  auto res = publisher.send(message, zmq::send_flags::none);
+  return res.has_value();
+}
+
+/**
+ * @brief Send a state message.
+ * @param state The StateMessage to publish
+ * @param publisher The configured ZMQ publisher socket
+ * @return True if the state was published, false otherwise
+ */
+inline bool send(const StateMessage& state, zmq::socket_t& publisher) {
+  return send(encode_state(state), publisher);
+}
+
+/**
+ * @brief Send a command message.
+ * @param command The CommandMessage to publish
+ * @param publisher The configured ZMQ publisher socket
+ * @return True if the command was published, false otherwise
+ */
+inline bool send(const CommandMessage& command, zmq::socket_t& publisher) {
+  return send(encode_command(command), publisher);
+}
+
+/**
+ * @brief Poll the socket for a sequence of encoded field messages.
+ * @param[out] fields A vector of encoded fields to modify by reference if a message is available
+ * @param subscriber The configured ZMQ subscriber socket
+ * @return True if a state was received, false otherwise
+ */
+inline bool poll(std::vector<std::string>& fields, zmq::socket_t& subscriber) {
+  zmq::message_t message;
+  auto res = subscriber.recv(message, zmq::recv_flags::dontwait);
+  if (res) {
+    fields = clproto::unpack_fields(static_cast<const char*>(message.data()));
+  }
+  return res.has_value();
+}
+
+/**
+ * @brief Poll the socket for a state message.
+ * @param[out] state The StateMessage object to modify by reference if a message is available
+ * @param subscriber The configured ZMQ subscriber socket
+ * @return True if a state was received, false otherwise
+ */
+inline bool poll(StateMessage& state, zmq::socket_t& subscriber) {
+  std::vector<std::string> fields;
+  auto res = poll(fields, subscriber);
+  if (res) {
+    state = decode_state(fields);
+  }
+  return res;
+}
+
+/**
+ * @brief Poll the socket for a command message.
+ * @param[out] command The CommandMessage object to modify by reference if a message is available
+ * @param subscriber The configured ZMQ subscriber socket
+ * @return True if a command was received, false otherwise
+ */
+inline bool poll(CommandMessage& command, zmq::socket_t& subscriber) {
+  std::vector<std::string> fields;
+  auto res = poll(fields, subscriber);
+  if (res) {
+    command = decode_command(fields);
+  }
+  return res;
+}
+}// namespace network_interfaces::franka
