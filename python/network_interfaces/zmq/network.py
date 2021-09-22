@@ -4,6 +4,8 @@ import clproto
 import state_representation as sr
 import zmq
 
+from network_interfaces.control_type import ControlType
+
 
 @dataclass
 class StateMessage:
@@ -17,10 +19,10 @@ class StateMessage:
 @dataclass
 class CommandMessage:
     """
-    A collection of state variables in Cartesian and joint space that the
-    robot follows according to the specified control type.
+    A collection of state variables in joint space that the robot follows according
+    to the specified control type.
     """
-    ee_state: sr.CartesianState
+    control_type: list[ControlType]
     joint_state: sr.JointState
 
 
@@ -49,7 +51,8 @@ def encode_command(command):
     :rtype: list of str
     """
     encoded_command = list()
-    encoded_command.append(clproto.encode(command.ee_state, clproto.MessageType.CARTESIAN_STATE_MESSAGE))
+    control_type_param = sr.Parameter("control_type", command.control_type, sr.StateType.PARAMETER_INT_ARRAY)
+    encoded_command.append(clproto.encode(control_type_param, clproto.MessageType.PARAMETER_MESSAGE))
     encoded_command.append(clproto.encode(command.joint_state, clproto.MessageType.JOINT_STATE_MESSAGE))
     return encoded_command
 
