@@ -7,7 +7,7 @@
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
-#include "control_type.h"
+#include "network_interfaces/control_type.h"
 
 namespace network_interfaces::zmq {
 
@@ -18,16 +18,17 @@ namespace network_interfaces::zmq {
 struct StateMessage {
   state_representation::CartesianState ee_state;
   state_representation::JointState joint_state;
+  // TODO jacobian / mass ?
 };
 
 /**
  * @struct CommandMessage
- * @brief A collection of state variables in Cartesian and joint space that the robot
+ * @brief A collection of state variables in joint space that the robot
  * follows according to the specified control type.
  * @see ControlType
  */
 struct CommandMessage {
-  state_representation::CartesianState ee_state;
+  network_interfaces::ControlType control_type;
   state_representation::JointState joint_state;
 };
 
@@ -52,7 +53,7 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
  */
 inline std::vector<std::string> encode_command(const CommandMessage& command) {
   std::vector<std::string> encoded_command;
-  encoded_command.emplace_back(clproto::encode(command.ee_state));
+  encoded_command.emplace_back(clproto::encode(command.control_type));
   encoded_command.emplace_back(clproto::encode(command.joint_state));
   return encoded_command;
 }
@@ -93,11 +94,12 @@ inline CommandMessage decode_command(const std::vector<std::string>& message) {
  * @param bind_subscriber Optional flag to decide if subscriber should bind or connect
  */
 inline void configure_subscriber(
-    zmq::context_t& context, zmq::socket_t& subscriber, const std::string& subscriber_uri, bool bind_subscriber = false
+    ::zmq::context_t& context, ::zmq::socket_t& subscriber, const std::string& subscriber_uri,
+    bool bind_subscriber = false
 ) {
-  subscriber = zmq::socket_t(context, ZMQ_SUB);
-  subscriber.set(zmq::sockopt::conflate, 1);
-  subscriber.set(zmq::sockopt::subscribe, "");
+  subscriber = ::zmq::socket_t(context, ZMQ_SUB);
+  subscriber.set(::zmq::sockopt::conflate, 1);
+  subscriber.set(::zmq::sockopt::subscribe, "");
   if (bind_subscriber) {
     subscriber.bind("tcp://" + subscriber_uri);
   } else {
@@ -113,9 +115,9 @@ inline void configure_subscriber(
  * @param bind_publisher Optional flag to decide if publisher should bind or connect
  */
 inline void configure_publisher(
-    zmq::context_t& context, zmq::socket_t& publisher, const std::string& publisher_uri, bool bind_publisher = true
+    ::zmq::context_t& context, ::zmq::socket_t& publisher, const std::string& publisher_uri, bool bind_publisher = true
 ) {
-  publisher = zmq::socket_t(context, ZMQ_PUB);
+  publisher = ::zmq::socket_t(context, ZMQ_PUB);
   if (bind_publisher) {
     publisher.bind("tcp://" + publisher_uri);
   } else {
@@ -134,11 +136,12 @@ inline void configure_publisher(
  * @param bind_publisher Optional flag to decide if publisher should bind or connect
  */
 inline void configure_sockets(
-    zmq::context_t& context, zmq::socket_t& subscriber, const std::string& subscriber_uri, zmq::socket_t& publisher,
-    const std::string& publisher_uri, bool bind_subscriber, bool bind_publisher
+    ::zmq::context_t& context, ::zmq::socket_t& subscriber, const std::string& subscriber_uri,
+    ::zmq::socket_t& publisher, const std::string& publisher_uri, bool bind_subscriber = false,
+    bool bind_publisher = true
 ) {
   configure_subscriber(context, subscriber, subscriber_uri, bind_subscriber);
-  configure_publisher(context, publisher, publisher_uri, bind_publisher):
+  configure_publisher(context, publisher, publisher_uri, bind_publisher);
 }
 
 // --- Transceiving methods --- //
@@ -149,10 +152,10 @@ inline void configure_sockets(
  * @param publisher The configured ZMQ publisher socket
  * @return True if the state was published, false otherwise
  */
-inline bool send(const std::vector<std::string>& fields, zmq::socket_t& publisher) {
-  zmq::message_t message(fields.size() * CLPROTO_PACKING_MAX_FIELD_LENGTH);
+inline bool send(const std::vector<std::string>& fields, ::zmq::socket_t& publisher) {
+  ::zmq::message_t message(fields.size() * CLPROTO_PACKING_MAX_FIELD_LENGTH);
   clproto::pack_fields(fields, static_cast<char*>(message.data()));
-  auto res = publisher.send(message, zmq::send_flags::none);
+  auto res = publisher.send(message, ::zmq::send_flags::none);
   return res.has_value();
 }
 
@@ -162,7 +165,7 @@ inline bool send(const std::vector<std::string>& fields, zmq::socket_t& publishe
  * @param publisher The configured ZMQ publisher socket
  * @return True if the state was published, false otherwise
  */
-inline bool send(const StateMessage& state, zmq::socket_t& publisher) {
+inline bool send(const StateMessage& state, ::zmq::socket_t& publisher) {
   return send(encode_state(state), publisher);
 }
 
@@ -172,7 +175,7 @@ inline bool send(const StateMessage& state, zmq::socket_t& publisher) {
  * @param publisher The configured ZMQ publisher socket
  * @return True if the command was published, false otherwise
  */
-inline bool send(const CommandMessage& command, zmq::socket_t& publisher) {
+inline bool send(const CommandMessage& command, ::zmq::socket_t& publisher) {
   return send(encode_command(command), publisher);
 }
 
@@ -182,9 +185,9 @@ inline bool send(const CommandMessage& command, zmq::socket_t& publisher) {
  * @param subscriber The configured ZMQ subscriber socket
  * @return True if a state was received, false otherwise
  */
-inline bool poll(std::vector<std::string>& fields, zmq::socket_t& subscriber) {
-  zmq::message_t message;
-  auto res = subscriber.recv(message, zmq::recv_flags::dontwait);
+inline bool poll(std::vector<std::string>& fields, ::zmq::socket_t& subscriber) {
+  ::zmq::message_t message;
+  auto res = subscriber.recv(message, ::zmq::recv_flags::dontwait);
   if (res) {
     fields = clproto::unpack_fields(static_cast<const char*>(message.data()));
   }
@@ -197,7 +200,7 @@ inline bool poll(std::vector<std::string>& fields, zmq::socket_t& subscriber) {
  * @param subscriber The configured ZMQ subscriber socket
  * @return True if a state was received, false otherwise
  */
-inline bool poll(StateMessage& state, zmq::socket_t& subscriber) {
+inline bool poll(StateMessage& state, ::zmq::socket_t& subscriber) {
   std::vector<std::string> fields;
   auto res = poll(fields, subscriber);
   if (res) {
@@ -212,7 +215,7 @@ inline bool poll(StateMessage& state, zmq::socket_t& subscriber) {
  * @param subscriber The configured ZMQ subscriber socket
  * @return True if a command was received, false otherwise
  */
-inline bool poll(CommandMessage& command, zmq::socket_t& subscriber) {
+inline bool poll(CommandMessage& command, ::zmq::socket_t& subscriber) {
   std::vector<std::string> fields;
   auto res = poll(fields, subscriber);
   if (res) {
