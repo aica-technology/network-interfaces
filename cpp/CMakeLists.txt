@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(network_interfaces VERSION 0.0)
 
-option(BUILD_TESTING "Build tests." ON)
+option(BUILD_TESTING "Build tests." OFF)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
