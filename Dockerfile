@@ -21,6 +21,8 @@ RUN rm -rf cppzmq*
 RUN pip3 install pyzmq
 
 WORKDIR ${HOME}
+COPY --chown=${USER} ./python ./python
+RUN pip3 install -e ./python
 
 # Clean image
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
