@@ -1,10 +1,9 @@
 from dataclasses import dataclass
+from typing import List
 
 import clproto
 import state_representation as sr
 import zmq
-
-from network_interfaces.control_type import ControlType
 
 
 @dataclass
@@ -22,7 +21,7 @@ class CommandMessage:
     A collection of state variables in joint space that the robot follows according
     to the specified control type.
     """
-    control_type: list[ControlType]
+    control_type: List[int]
     joint_state: sr.JointState
 
 
@@ -79,7 +78,7 @@ def decode_command(message):
     :return: The equivalent CommandMessage
     :rtype: CommandMessage
     """
-    command = CommandMessage(clproto.decode(message[0]), clproto.decode(message[1]))
+    command = CommandMessage(clproto.decode(message[0]).get_value(), clproto.decode(message[1]))
     return command
 
 
