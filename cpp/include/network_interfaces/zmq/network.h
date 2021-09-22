@@ -7,8 +7,6 @@
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
-#include "network_interfaces/control_type.h"
-
 namespace network_interfaces::zmq {
 
 /**
@@ -28,7 +26,7 @@ struct StateMessage {
  * @see ControlType
  */
 struct CommandMessage {
-  network_interfaces::ControlType control_type;
+  std::vector<int> control_type;
   state_representation::JointState joint_state;
 };
 
@@ -53,7 +51,8 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
  */
 inline std::vector<std::string> encode_command(const CommandMessage& command) {
   std::vector<std::string> encoded_command;
-  encoded_command.emplace_back(clproto::encode(command.control_type));
+  encoded_command.emplace_back(
+      clproto::encode(state_representation::Parameter<std::vector<int>>("control_type", command.control_type)));
   encoded_command.emplace_back(clproto::encode(command.joint_state));
   return encoded_command;
 }
@@ -79,7 +78,7 @@ inline StateMessage decode_state(const std::vector<std::string>& message) {
  */
 inline CommandMessage decode_command(const std::vector<std::string>& message) {
   CommandMessage command;
-  command.ee_state = clproto::decode<state_representation::CartesianState>(message.at(0));
+  command.control_type = clproto::decode<state_representation::Parameter<std::vector<int>>>(message.at(0)).get_value();
   command.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
   return command;
 }
