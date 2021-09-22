@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(network_interfaces VERSION 0.0)
 
-option(BUILD_TESTING "Build tests." OFF)
+option(BUILD_TESTING "Build tests." ON)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -28,12 +28,9 @@ find_library(protobuf REQUIRED)
 find_library(state_representation REQUIRED)
 
 find_package(cppzmq REQUIRED)
-find_package(Eigen3 REQUIRED)
 
 include_directories(
         include
-        ${Eigen3_INCLUDE_DIRS}
-        /usr/local/include/eigen3/
 )
 
 install(DIRECTORY include/
@@ -41,5 +38,9 @@ install(DIRECTORY include/
 )
 
 if(BUILD_TESTING)
-    add_subdirectory(test)
+    link_directories(/usr/local/lib)
+    add_executable(test_communication test/test_communication.cpp)
+    target_link_libraries(test_communication ${GTEST_LIBRARIES} pthread)
+    add_test(NAME test_communication COMMAND test_communication)
+    target_link_libraries(test_communication clproto cppzmq state_representation)
 endif()

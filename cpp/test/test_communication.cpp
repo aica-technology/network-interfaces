@@ -78,3 +78,8 @@ TEST_F(TestNetworkInterface, TestCommunication) {
   robot.join();
   control.join();
 }
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
