@@ -7,16 +7,9 @@
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
-namespace network_interfaces::franka {
+#include "control_type.h"
 
-// TODO
-/**
- * @enum ControlType
- * @brief An enumeration of the possible control types in Cartesian and joint space.
- */
-enum ControlType {
-  NONE = 0
-};
+namespace network_interfaces::zmq {
 
 /**
  * @struct StateMessage
@@ -227,4 +220,4 @@ inline bool poll(CommandMessage& command, zmq::socket_t& subscriber) {
   }
   return res;
 }
-}// namespace network_interfaces::franka
+}// namespace network_interfaces::zmq
