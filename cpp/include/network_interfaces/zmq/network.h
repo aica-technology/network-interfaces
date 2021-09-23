@@ -8,6 +8,8 @@
 #include <zmq.hpp>
 
 #include "network_interfaces/control_type.h"
+#include "network_interfaces/zmq/exceptions/InvalidControlTypeVectorException.h"
+#include "network_interfaces/zmq/exceptions/UnknownControlTypeException.h"
 
 namespace network_interfaces::zmq {
 
@@ -76,7 +78,24 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
  * @param state The CommandMessage to encode
  * @return An ordered vector of encoded strings representing the command message fields
  */
-inline std::vector<std::string> encode_command(const CommandMessage& command) {
+inline std::vector<std::string> encode_command(CommandMessage& command) {
+  if (command.control_type.size() != command.joint_state.get_size()) {
+    if (command.control_type.size() == 1 && !command.joint_state.is_empty()) {
+      command.control_type = std::vector<int>(command.joint_state.get_size(), command.control_type.at(0));
+    } else {
+      throw network_interfaces::zmq::exceptions::InvalidControlTypeVectorException(
+          "The size of field 'control_type' of the CommandMessage does not correspond "
+          "to the size of the field 'joint state'."
+      );
+    }
+  }
+  for (std::size_t i = 0; i < command.joint_state.get_size(); ++i) {
+    if (command.control_type.at(i) < 0 || command.control_type.at(i) > 4) {
+      throw network_interfaces::zmq::exceptions::UnknownControlTypeException(
+          "The desired 'control_type' of the CommandMessage is unknown."
+      );
+    }
+  }
   std::vector<std::string> encoded_command;
   encoded_command.emplace_back(
       clproto::encode(state_representation::Parameter<std::vector<int>>("control_type", command.control_type)));
@@ -203,7 +222,7 @@ inline bool send(const StateMessage& state, ::zmq::socket_t& publisher) {
  * @param publisher The configured ZMQ publisher socket
  * @return True if the command was published, false otherwise
  */
-inline bool send(const CommandMessage& command, ::zmq::socket_t& publisher) {
+inline bool send(CommandMessage& command, ::zmq::socket_t& publisher) {
   return send(encode_command(command), publisher);
 }
 

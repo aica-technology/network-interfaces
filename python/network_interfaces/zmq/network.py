@@ -16,6 +16,17 @@ class StateMessage:
     jacobian: sr.Jacobian
     mass: sr.Parameter("mass", sr.StateType.PARAMETER_MATRIX)
 
+    def __init__(self, ee_state=sr.CartesianState(), joint_state=sr.JointState(), jacobian=sr.Jacobian(),
+                 mass=sr.Parameter("mass", sr.StateType.PARAMETER_MATRIX)):
+        assert isinstance(ee_state, sr.CartesianState)
+        assert isinstance(joint_state, sr.JointState)
+        assert isinstance(jacobian, sr.Jacobian)
+        assert isinstance(mass, sr.Parameter)
+        self.ee_state = ee_state
+        self.joint_state = joint_state
+        self.jacobian = jacobian
+        self.mass = mass
+
 
 @dataclass
 class CommandMessage:
@@ -25,6 +36,14 @@ class CommandMessage:
     """
     control_type: List[int]
     joint_state: sr.JointState
+
+    def __init__(self, control_type=None, joint_state=sr.JointState()):
+        if control_type is None:
+            control_type = []
+        assert isinstance(control_type, list)
+        assert isinstance(joint_state, sr.JointState)
+        self.control_type = control_type
+        self.joint_state = joint_state
 
 
 def encode_state(state):
@@ -53,6 +72,15 @@ def encode_command(command):
     :return: An ordered vector of encoded strings representing the command message fields
     :rtype: list of str
     """
+    if len(command.control_type) != command.joint_state.get_size():
+        if len(command.control_type) == 1 and not command.joint_state.is_empty():
+            command.control_type = [command.control_type[0]] * command.joint_state.get_size()
+        else:
+            raise ValueError("The size of field 'control_type' of the CommandMessage does not correspond"
+                             " to the size of the field 'joint state'.")
+    for i in range(command.joint_state.get_size()):
+        if command.control_type[i] < 0 or command.control_type[i] > 4:
+            raise ValueError("The desired 'control_type' of the CommandMessage is unknown.")
     encoded_command = list()
     control_type_param = sr.Parameter("control_type", command.control_type, sr.StateType.PARAMETER_INT_ARRAY)
     encoded_command.append(clproto.encode(control_type_param, clproto.MessageType.PARAMETER_MESSAGE))

@@ -2,13 +2,18 @@
 #include <thread>
 
 #include "network_interfaces/zmq/network.h"
+#include "network_interfaces/zmq/exceptions/InvalidControlTypeVectorException.h"
+#include "network_interfaces/zmq/exceptions/UnknownControlTypeException.h"
 
-static void expect_joint_state_equal(const state_representation::JointState& js1, const state_representation::JointState& js2) {
+static void
+expect_joint_state_equal(const state_representation::JointState& js1, const state_representation::JointState& js2) {
   EXPECT_TRUE(js1.data().isApprox(js2.data()));
   EXPECT_TRUE(js1.is_compatible(js2));
 }
 
-static void expect_cart_state_equal(const state_representation::CartesianState& cs1, const state_representation::CartesianState& cs2) {
+static void expect_cart_state_equal(
+    const state_representation::CartesianState& cs1, const state_representation::CartesianState& cs2
+) {
   EXPECT_TRUE(cs1.data().isApprox(cs2.data()));
   EXPECT_TRUE(cs1.is_compatible(cs2));
 }
@@ -27,7 +32,8 @@ public:
   state_representation::CartesianState robot_state;
   state_representation::JointState robot_joint_state;
   state_representation::Jacobian robot_jacobian;
-  state_representation::Parameter<Eigen::MatrixXd> robot_mass = state_representation::Parameter<Eigen::MatrixXd>("robot");
+  state_representation::Parameter<Eigen::MatrixXd>
+      robot_mass = state_representation::Parameter<Eigen::MatrixXd>("robot");
   state_representation::JointState control_joint_state;
   std::vector<int> control_type;
 
@@ -88,6 +94,38 @@ public:
   }
 };
 
+TEST_F(TestNetworkInterface, TestEncodeCommand) {
+  network_interfaces::zmq::CommandMessage command;
+  command.joint_state = state_representation::JointState::Random("test", 3);
+  command.control_type = std::vector<int>{};
+  EXPECT_THROW(network_interfaces::zmq::encode_command(command),
+               network_interfaces::zmq::exceptions::InvalidControlTypeVectorException);
+
+  command.control_type = std::vector<int>{1};
+  network_interfaces::zmq::encode_command(command);
+  ASSERT_EQ(command.control_type.size(), 3);
+  for (std::size_t i = 0; i < 3; ++i) {
+    EXPECT_EQ(command.control_type.at(i), 1);
+  }
+
+  command.control_type = std::vector<int>{1, 2, 6};
+  EXPECT_THROW(network_interfaces::zmq::encode_command(command),
+               network_interfaces::zmq::exceptions::UnknownControlTypeException);
+
+  command.control_type = std::vector<int>{1, 2, 2, 1};
+  EXPECT_THROW(network_interfaces::zmq::encode_command(command),
+               network_interfaces::zmq::exceptions::InvalidControlTypeVectorException);
+}
+
+TEST_F(TestNetworkInterface, TestEmptyEncodeCommand) {
+  network_interfaces::zmq::CommandMessage command;
+  EXPECT_NO_THROW(network_interfaces::zmq::encode_command(command));
+
+  command.control_type = std::vector<int>{1};
+  EXPECT_THROW(network_interfaces::zmq::encode_command(command),
+               network_interfaces::zmq::exceptions::InvalidControlTypeVectorException);
+}
+
 TEST_F(TestNetworkInterface, TestCommunication) {
   std::thread robot = spawn_robot();
   std::thread control = spawn_control();
@@ -96,7 +134,7 @@ TEST_F(TestNetworkInterface, TestCommunication) {
   control.join();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

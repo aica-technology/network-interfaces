@@ -76,3 +76,25 @@ class TestNetworkInterface(unittest.TestCase):
         self.assert_state_equal(self.received_state.jacobian, self.robot_jacobian)
         self.assertTrue(self.received_state.mass.is_compatible(self.robot_mass))
         assert_array_almost_equal(self.received_state.mass.get_value(), self.robot_mass.get_value())
+
+    def test_encode_command(self):
+        command = network.CommandMessage([], sr.JointState())
+        network.encode_command(command)
+
+        command = network.CommandMessage([], sr.JointState().Random("test", 3))
+        with self.assertRaises(ValueError):
+            network.encode_command(command)
+
+        command.control_type = [1]
+        encoded = network.encode_command(command)
+        decoded = network.decode_command(encoded)
+        self.assertEqual(len(decoded.control_type), 3)
+        assert_array_almost_equal(decoded.control_type, [1, 1, 1])
+
+        command.control_type = [1, 2, 6]
+        with self.assertRaises(ValueError):
+            network.encode_command(command)
+
+        command.control_type = [1, 2, 2, 1]
+        with self.assertRaises(ValueError):
+            network.encode_command(command)
