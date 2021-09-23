@@ -2,15 +2,19 @@ import threading
 import time
 import unittest
 
-from network_interfaces.zmq import network
+import numpy as np
 import state_representation as sr
 import zmq
 from numpy.testing import assert_array_almost_equal
+
+from network_interfaces.zmq import network
 
 
 class TestNetworkInterface(unittest.TestCase):
     robot_state = None
     robot_joint_state = None
+    robot_jacobian = None
+    robot_mass = None
     control_command = None
     control_type = None
     context = None
@@ -21,15 +25,21 @@ class TestNetworkInterface(unittest.TestCase):
     def setUpClass(cls):
         cls.robot_state = sr.CartesianState().Random("ee", "robot")
         cls.robot_joint_state = sr.JointState().Random("robot", 3)
+        cls.robot_jacobian = sr.Jacobian().Random("robot", 3, "frame")
+        cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.StateType.PARAMETER_MATRIX)
         cls.control_command = sr.JointState().Random("robot", 3)
         cls.control_type = [1, 2, 3]
         cls.context = zmq.Context()
+
+    def assert_state_equal(self, state1, state2):
+        self.assertTrue(state1.is_compatible(state2))
+        assert_array_almost_equal(state1.data(), state2.data())
 
     def robot(self):
         command_subscriber, state_publisher = network.configure_sockets(self.context, "127.0.0.1:1702",
                                                                         "127.0.0.1:1701")
 
-        state = network.StateMessage(self.robot_state, self.robot_joint_state)
+        state = network.StateMessage(self.robot_state, self.robot_joint_state, self.robot_jacobian, self.robot_mass)
         command = []
         for i in range(100):
             network.send_state(state, state_publisher)
@@ -59,10 +69,32 @@ class TestNetworkInterface(unittest.TestCase):
 
         [self.assertEqual(self.received_command.control_type[i], self.control_type[i]) for i in
          range(len(self.control_type))]
-        self.assertTrue(self.received_command.joint_state.is_compatible(self.control_command))
-        assert_array_almost_equal(self.received_command.joint_state.data(), self.control_command.data())
+        self.assert_state_equal(self.received_command.joint_state, self.control_command)
 
-        self.assertTrue(self.received_state.ee_state.is_compatible(self.robot_state))
-        assert_array_almost_equal(self.received_state.ee_state.data(), self.robot_state.data())
-        self.assertTrue(self.received_state.joint_state.is_compatible(self.robot_joint_state))
-        assert_array_almost_equal(self.received_state.joint_state.data(), self.robot_joint_state.data())
+        self.assert_state_equal(self.received_state.ee_state, self.robot_state)
+        self.assert_state_equal(self.received_state.joint_state, self.robot_joint_state)
+        self.assert_state_equal(self.received_state.jacobian, self.robot_jacobian)
+        self.assertTrue(self.received_state.mass.is_compatible(self.robot_mass))
+        assert_array_almost_equal(self.received_state.mass.get_value(), self.robot_mass.get_value())
+
+    def test_encode_command(self):
+        command = network.CommandMessage([], sr.JointState())
+        network.encode_command(command)
+
+        command = network.CommandMessage([], sr.JointState().Random("test", 3))
+        with self.assertRaises(ValueError):
+            network.encode_command(command)
+
+        command.control_type = [1]
+        encoded = network.encode_command(command)
+        decoded = network.decode_command(encoded)
+        self.assertEqual(len(decoded.control_type), 3)
+        assert_array_almost_equal(decoded.control_type, [1, 1, 1])
+
+        command.control_type = [1, 2, 6]
+        with self.assertRaises(ValueError):
+            network.encode_command(command)
+
+        command.control_type = [1, 2, 2, 1]
+        with self.assertRaises(ValueError):
+            network.encode_command(command)

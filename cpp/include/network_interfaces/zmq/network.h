@@ -7,6 +7,10 @@
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
+#include "network_interfaces/control_type.h"
+#include "network_interfaces/zmq/exceptions/InvalidControlTypeVectorException.h"
+#include "network_interfaces/zmq/exceptions/UnknownControlTypeException.h"
+
 namespace network_interfaces::zmq {
 
 /**
@@ -16,7 +20,20 @@ namespace network_interfaces::zmq {
 struct StateMessage {
   state_representation::CartesianState ee_state;
   state_representation::JointState joint_state;
-  // TODO jacobian / mass ?
+  state_representation::Jacobian jacobian;
+  state_representation::Parameter<Eigen::MatrixXd> mass = state_representation::Parameter<Eigen::MatrixXd>("mass");
+
+  friend std::ostream& operator<<(std::ostream& os, const StateMessage& message) {
+    os << "StateMessage" << std::endl;
+    os << message.ee_state << std::endl;
+    os << "-" << std::endl;
+    os << message.joint_state << std::endl;
+    os << "-" << std::endl;
+    os << message.jacobian << std::endl;
+    os << "-" << std::endl;
+    os << message.mass << std::endl;
+    return os;
+  }
 };
 
 /**
@@ -28,6 +45,16 @@ struct StateMessage {
 struct CommandMessage {
   std::vector<int> control_type;
   state_representation::JointState joint_state;
+
+  friend std::ostream& operator<<(std::ostream& os, const CommandMessage& message) {
+    os << "CommandMessage" << std::endl;
+    for (int i: message.control_type) {
+      os << control_type_t(i) << " | ";
+    }
+    os << std::endl << "-" << std::endl;
+    os << message.joint_state << std::endl;
+    return os;
+  }
 };
 
 // --- Encoding methods --- //
@@ -41,6 +68,8 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
   std::vector<std::string> encoded_state;
   encoded_state.emplace_back(clproto::encode(state.ee_state));
   encoded_state.emplace_back(clproto::encode(state.joint_state));
+  encoded_state.emplace_back(clproto::encode(state.jacobian));
+  encoded_state.emplace_back(clproto::encode(state.mass));
   return encoded_state;
 }
 
@@ -49,7 +78,25 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
  * @param state The CommandMessage to encode
  * @return An ordered vector of encoded strings representing the command message fields
  */
-inline std::vector<std::string> encode_command(const CommandMessage& command) {
+inline std::vector<std::string> encode_command(CommandMessage& command) {
+  if (command.control_type.size() != command.joint_state.get_size()) {
+    if (command.control_type.size() == 1 && !command.joint_state.is_empty()) {
+      command.control_type = std::vector<int>(command.joint_state.get_size(), command.control_type.at(0));
+    } else {
+      throw network_interfaces::zmq::exceptions::InvalidControlTypeVectorException(
+          "The size of field 'control_type' of the CommandMessage does not correspond "
+          "to the size of the field 'joint state'."
+      );
+    }
+  }
+  for (std::size_t i = 0; i < command.joint_state.get_size(); ++i) {
+    if (static_cast<network_interfaces::control_type_t>(command.control_type.at(i))
+        >= network_interfaces::control_type_t::END) {
+      throw network_interfaces::zmq::exceptions::UnknownControlTypeException(
+          "The desired 'control_type' of the CommandMessage is unknown."
+      );
+    }
+  }
   std::vector<std::string> encoded_command;
   encoded_command.emplace_back(
       clproto::encode(state_representation::Parameter<std::vector<int>>("control_type", command.control_type)));
@@ -68,6 +115,8 @@ inline StateMessage decode_state(const std::vector<std::string>& message) {
   StateMessage state;
   state.ee_state = clproto::decode<state_representation::CartesianState>(message.at(0));
   state.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
+  state.jacobian = clproto::decode<state_representation::Jacobian>(message.at(2));
+  state.mass = clproto::decode<state_representation::Parameter<Eigen::MatrixXd>>(message.at(3));
   return state;
 }
 
@@ -174,7 +223,7 @@ inline bool send(const StateMessage& state, ::zmq::socket_t& publisher) {
  * @param publisher The configured ZMQ publisher socket
  * @return True if the command was published, false otherwise
  */
-inline bool send(const CommandMessage& command, ::zmq::socket_t& publisher) {
+inline bool send(CommandMessage& command, ::zmq::socket_t& publisher) {
   return send(encode_command(command), publisher);
 }
 
