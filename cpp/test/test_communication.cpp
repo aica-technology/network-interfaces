@@ -34,7 +34,7 @@ public:
     state.joint_state = robot_joint_state;
     for (std::size_t i = 0; i < 100; ++i) {
       network_interfaces::zmq::send(state, state_publisher);
-      network_interfaces::zmq::poll(command, command_subscriber);
+      network_interfaces::zmq::receive(command, command_subscriber);
       usleep(10000);
     }
     EXPECT_TRUE(command.joint_state.data().isApprox(control_command.data()));
@@ -61,7 +61,7 @@ public:
     command.control_type = control_type;
     for (std::size_t i = 0; i < 100; ++i) {
       network_interfaces::zmq::send(command, command_publisher);
-      network_interfaces::zmq::poll(state, state_subscriber);
+      network_interfaces::zmq::receive(state, state_subscriber);
       usleep(10000);
     }
     EXPECT_TRUE(state.ee_state.data().isApprox(robot_state.data()));

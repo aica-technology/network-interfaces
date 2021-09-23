@@ -183,9 +183,9 @@ def send_command(command, publisher):
     send_encoded_fields(encode_command(command), publisher)
 
 
-def poll_encoded_fields(subscriber, wait=False):
+def receive_encoded_fields(subscriber, wait=False):
     """
-    Poll the socket for a sequence of encoded field messages.
+    Receive a sequence of encoded field messages from the socket.
 
     :param subscriber: The configured ZMQ subscriber socket
     :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
@@ -206,9 +206,9 @@ def poll_encoded_fields(subscriber, wait=False):
     return fields
 
 
-def poll_state(subscriber, wait=False):
+def receive_state(subscriber, wait=False):
     """
-    Poll the socket for a state message.
+    Receive a state message from the socket.
 
     :param subscriber: The configured ZMQ subscriber socket
     :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
@@ -217,14 +217,14 @@ def poll_state(subscriber, wait=False):
     :return: The StateMessage object if a message is available
     :rtype: StateMessage
     """
-    fields = poll_encoded_fields(subscriber, wait)
+    fields = receive_encoded_fields(subscriber, wait)
     if fields:
         return decode_state(fields)
 
 
-def poll_command(subscriber, wait=False):
+def receive_command(subscriber, wait=False):
     """
-    Poll the socket for a command message.
+    Receive a command message from the socket.
 
     :param subscriber: The configured ZMQ subscriber socket
     :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
@@ -233,6 +233,6 @@ def poll_command(subscriber, wait=False):
     :return: The CommandMessage object if a message is available
     :rtype: CommandMessage
     """
-    fields = poll_encoded_fields(subscriber, wait)
+    fields = receive_encoded_fields(subscriber, wait)
     if fields:
         return decode_command(fields)

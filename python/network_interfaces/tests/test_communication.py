@@ -33,7 +33,7 @@ class TestNetworkInterface(unittest.TestCase):
         command = []
         for i in range(100):
             network.send_state(state, state_publisher)
-            command = network.poll_command(command_subscriber)
+            command = network.receive_command(command_subscriber)
             time.sleep(0.01)
         self.received_command = command
 
@@ -45,7 +45,7 @@ class TestNetworkInterface(unittest.TestCase):
         state = []
         for i in range(100):
             network.send_command(command, command_publisher)
-            state = network.poll_state(state_subscriber)
+            state = network.receive_state(state_subscriber)
             time.sleep(0.01)
         self.received_state = state
 
