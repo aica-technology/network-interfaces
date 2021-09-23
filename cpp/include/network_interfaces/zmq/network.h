@@ -23,7 +23,7 @@ struct StateMessage {
   state_representation::Jacobian jacobian;
   state_representation::Parameter<Eigen::MatrixXd> mass = state_representation::Parameter<Eigen::MatrixXd>("mass");
 
-  friend std::ostream& operator<<(std::ostream& os, const StateMessage& message) {
+  inline friend std::ostream& operator<<(std::ostream& os, const StateMessage& message) {
     os << "StateMessage" << std::endl;
     os << message.ee_state << std::endl;
     os << "-" << std::endl;
@@ -46,7 +46,7 @@ struct CommandMessage {
   std::vector<int> control_type;
   state_representation::JointState joint_state;
 
-  friend std::ostream& operator<<(std::ostream& os, const CommandMessage& message) {
+  inline friend std::ostream& operator<<(std::ostream& os, const CommandMessage& message) {
     os << "CommandMessage" << std::endl;
     for (int i: message.control_type) {
       os << control_type_t(i) << " | ";
