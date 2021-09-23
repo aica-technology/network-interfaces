@@ -5,6 +5,8 @@ import clproto
 import state_representation as sr
 import zmq
 
+from network_interfaces.control_type import ControlType
+
 
 @dataclass
 class StateMessage:
@@ -79,7 +81,7 @@ def encode_command(command):
             raise ValueError("The size of field 'control_type' of the CommandMessage does not correspond"
                              " to the size of the field 'joint state'.")
     for i in range(command.joint_state.get_size()):
-        if command.control_type[i] < 0 or command.control_type[i] > 4:
+        if command.control_type[i] >= ControlType.END.value:
             raise ValueError("The desired 'control_type' of the CommandMessage is unknown.")
     encoded_command = list()
     control_type_param = sr.Parameter("control_type", command.control_type, sr.StateType.PARAMETER_INT_ARRAY)

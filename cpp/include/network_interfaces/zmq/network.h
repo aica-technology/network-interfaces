@@ -90,7 +90,8 @@ inline std::vector<std::string> encode_command(CommandMessage& command) {
     }
   }
   for (std::size_t i = 0; i < command.joint_state.get_size(); ++i) {
-    if (command.control_type.at(i) < 0 || command.control_type.at(i) > 4) {
+    if (static_cast<network_interfaces::control_type_t>(command.control_type.at(i))
+        >= network_interfaces::control_type_t::END) {
       throw network_interfaces::zmq::exceptions::UnknownControlTypeException(
           "The desired 'control_type' of the CommandMessage is unknown."
       );

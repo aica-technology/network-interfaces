@@ -9,7 +9,7 @@ namespace network_interfaces {
  * @brief An enumeration of the possible control types.
  */
 enum class control_type_t : std::uint8_t {
-  UNDEFINED = 0, POSITION = 1, VELOCITY = 2, ACCELERATION = 3, EFFORT = 4,
+  UNDEFINED = 0, POSITION = 1, VELOCITY = 2, ACCELERATION = 3, EFFORT = 4, END = 5,
 };
 
 std::ostream& operator<<(std::ostream& os, control_type_t control_type) {

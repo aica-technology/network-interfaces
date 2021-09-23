@@ -10,3 +10,4 @@ class ControlType(Enum):
     VELOCITY = 2
     ACCELERATION = 3
     EFFORT = 4
+    END = 5
