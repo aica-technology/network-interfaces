@@ -13,6 +13,8 @@ class StateMessage:
     """
     ee_state: sr.CartesianState
     joint_state: sr.JointState
+    jacobian: sr.Jacobian
+    mass: sr.Parameter("mass", sr.StateType.PARAMETER_MATRIX)
 
 
 @dataclass
@@ -37,6 +39,8 @@ def encode_state(state):
     encoded_state = list()
     encoded_state.append(clproto.encode(state.ee_state, clproto.MessageType.CARTESIAN_STATE_MESSAGE))
     encoded_state.append(clproto.encode(state.joint_state, clproto.MessageType.JOINT_STATE_MESSAGE))
+    encoded_state.append(clproto.encode(state.jacobian, clproto.MessageType.JACOBIAN_MESSAGE))
+    encoded_state.append(clproto.encode(state.mass, clproto.MessageType.PARAMETER_MESSAGE))
     return encoded_state
 
 
@@ -65,7 +69,8 @@ def decode_state(message):
     :return: The equivalent StateMessage
     :rtype: StateMessage
     """
-    state = StateMessage(clproto.decode(message[0]), clproto.decode(message[1]))
+    state = StateMessage(clproto.decode(message[0]), clproto.decode(message[1]), clproto.decode(message[2]),
+                         clproto.decode(message[3]))
     return state
 
 
