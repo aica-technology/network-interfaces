@@ -12,7 +12,7 @@ enum class control_type_t : std::uint8_t {
   UNDEFINED = 0, POSITION = 1, VELOCITY = 2, ACCELERATION = 3, EFFORT = 4, END = 5,
 };
 
-std::ostream& operator<<(std::ostream& os, control_type_t control_type) {
+inline std::ostream& operator<<(std::ostream& os, control_type_t control_type) {
   switch (control_type) {
     case control_type_t::UNDEFINED:
       os << "UNDEFINED";
