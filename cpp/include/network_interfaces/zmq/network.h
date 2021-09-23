@@ -182,11 +182,13 @@ inline bool send(const CommandMessage& command, ::zmq::socket_t& publisher) {
  * @brief Poll the socket for a sequence of encoded field messages.
  * @param[out] fields A vector of encoded fields to modify by reference if a message is available
  * @param subscriber The configured ZMQ subscriber socket
+ * @param wait Optional flag to decide if the subscriber should wait for a message (true) or continue (false)
  * @return True if a state was received, false otherwise
  */
-inline bool poll(std::vector<std::string>& fields, ::zmq::socket_t& subscriber) {
+inline bool poll(std::vector<std::string>& fields, ::zmq::socket_t& subscriber, bool wait = false) {
+  ::zmq::recv_flags recv_flag = wait ? ::zmq::recv_flags::none : ::zmq::recv_flags::dontwait;
   ::zmq::message_t message;
-  auto res = subscriber.recv(message, ::zmq::recv_flags::dontwait);
+  auto res = subscriber.recv(message, recv_flag);
   if (res) {
     fields = clproto::unpack_fields(static_cast<const char*>(message.data()));
   }
@@ -197,11 +199,12 @@ inline bool poll(std::vector<std::string>& fields, ::zmq::socket_t& subscriber) 
  * @brief Poll the socket for a state message.
  * @param[out] state The StateMessage object to modify by reference if a message is available
  * @param subscriber The configured ZMQ subscriber socket
+ * @param wait Optional flag to decide if the subscriber should wait for a message (true) or continue (false)
  * @return True if a state was received, false otherwise
  */
-inline bool poll(StateMessage& state, ::zmq::socket_t& subscriber) {
+inline bool poll(StateMessage& state, ::zmq::socket_t& subscriber, bool wait = false) {
   std::vector<std::string> fields;
-  auto res = poll(fields, subscriber);
+  auto res = poll(fields, subscriber, wait);
   if (res) {
     state = decode_state(fields);
   }
@@ -212,11 +215,12 @@ inline bool poll(StateMessage& state, ::zmq::socket_t& subscriber) {
  * @brief Poll the socket for a command message.
  * @param[out] command The CommandMessage object to modify by reference if a message is available
  * @param subscriber The configured ZMQ subscriber socket
+ * @param wait Optional flag to decide if the subscriber should wait for a message (true) or continue (false)
  * @return True if a command was received, false otherwise
  */
-inline bool poll(CommandMessage& command, ::zmq::socket_t& subscriber) {
+inline bool poll(CommandMessage& command, ::zmq::socket_t& subscriber, bool wait = false) {
   std::vector<std::string> fields;
-  auto res = poll(fields, subscriber);
+  auto res = poll(fields, subscriber, wait);
   if (res) {
     command = decode_command(fields);
   }

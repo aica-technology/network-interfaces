@@ -183,17 +183,20 @@ def send_command(command, publisher):
     send_encoded_fields(encode_command(command), publisher)
 
 
-def poll_encoded_fields(subscriber):
+def poll_encoded_fields(subscriber, wait=False):
     """
     Poll the socket for a sequence of encoded field messages.
 
     :param subscriber: The configured ZMQ subscriber socket
+    :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
     :type subscriber: zmq.Socket
+    :type wait: bool
     :return: A vector of encoded fields if a message is available, empty otherwise
     :rtype: list of str
     """
+    zmq_flag = 0 if wait else zmq.DONTWAIT
     try:
-        message = subscriber.recv(zmq.DONTWAIT)
+        message = subscriber.recv(zmq_flag)
     except zmq.error.Again:
         return []
 
@@ -203,29 +206,33 @@ def poll_encoded_fields(subscriber):
     return fields
 
 
-def poll_state(subscriber):
+def poll_state(subscriber, wait=False):
     """
     Poll the socket for a state message.
 
     :param subscriber: The configured ZMQ subscriber socket
+    :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
     :type subscriber: zmq.Socket
+    :type wait: bool
     :return: The StateMessage object if a message is available
     :rtype: StateMessage
     """
-    fields = poll_encoded_fields(subscriber)
+    fields = poll_encoded_fields(subscriber, wait)
     if fields:
         return decode_state(fields)
 
 
-def poll_command(subscriber):
+def poll_command(subscriber, wait=False):
     """
     Poll the socket for a command message.
 
     :param subscriber: The configured ZMQ subscriber socket
+    :param wait: Optional flag to decide if the subscriber should wait for a message (True) or continue (False)
     :type subscriber: zmq.Socket
+    :type wait: bool
     :return: The CommandMessage object if a message is available
     :rtype: CommandMessage
     """
-    fields = poll_encoded_fields(subscriber)
+    fields = poll_encoded_fields(subscriber, wait)
     if fields:
         return decode_command(fields)
