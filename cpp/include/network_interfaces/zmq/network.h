@@ -7,6 +7,8 @@
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
+#include "network_interfaces/control_type.h"
+
 namespace network_interfaces::zmq {
 
 /**
@@ -16,7 +18,20 @@ namespace network_interfaces::zmq {
 struct StateMessage {
   state_representation::CartesianState ee_state;
   state_representation::JointState joint_state;
-  // TODO jacobian / mass ?
+  state_representation::Jacobian jacobian;
+  state_representation::Parameter<Eigen::MatrixXd> mass = state_representation::Parameter<Eigen::MatrixXd>("mass");
+
+  friend std::ostream& operator<<(std::ostream& os, const StateMessage& message) {
+    os << "StateMessage" << std::endl;
+    os << message.ee_state << std::endl;
+    os << "-" << std::endl;
+    os << message.joint_state << std::endl;
+    os << "-" << std::endl;
+    os << message.jacobian << std::endl;
+    os << "-" << std::endl;
+    os << message.mass << std::endl;
+    return os;
+  }
 };
 
 /**
@@ -28,6 +43,16 @@ struct StateMessage {
 struct CommandMessage {
   std::vector<int> control_type;
   state_representation::JointState joint_state;
+
+  friend std::ostream& operator<<(std::ostream& os, const CommandMessage& message) {
+    os << "CommandMessage" << std::endl;
+    for (int i: message.control_type) {
+      os << control_type_t(i) << " | ";
+    }
+    os << std::endl << "-" << std::endl;
+    os << message.joint_state << std::endl;
+    return os;
+  }
 };
 
 // --- Encoding methods --- //
@@ -41,6 +66,8 @@ inline std::vector<std::string> encode_state(const StateMessage& state) {
   std::vector<std::string> encoded_state;
   encoded_state.emplace_back(clproto::encode(state.ee_state));
   encoded_state.emplace_back(clproto::encode(state.joint_state));
+  encoded_state.emplace_back(clproto::encode(state.jacobian));
+  encoded_state.emplace_back(clproto::encode(state.mass));
   return encoded_state;
 }
 
@@ -68,6 +95,8 @@ inline StateMessage decode_state(const std::vector<std::string>& message) {
   StateMessage state;
   state.ee_state = clproto::decode<state_representation::CartesianState>(message.at(0));
   state.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
+  state.jacobian = clproto::decode<state_representation::Jacobian>(message.at(2));
+  state.mass = clproto::decode<state_representation::Parameter<Eigen::MatrixXd>>(message.at(3));
   return state;
 }
 

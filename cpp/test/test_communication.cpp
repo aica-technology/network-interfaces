@@ -3,18 +3,32 @@
 
 #include "network_interfaces/zmq/network.h"
 
+static void expect_joint_state_equal(const state_representation::JointState& js1, const state_representation::JointState& js2) {
+  EXPECT_TRUE(js1.data().isApprox(js2.data()));
+  EXPECT_TRUE(js1.is_compatible(js2));
+}
+
+static void expect_cart_state_equal(const state_representation::CartesianState& cs1, const state_representation::CartesianState& cs2) {
+  EXPECT_TRUE(cs1.data().isApprox(cs2.data()));
+  EXPECT_TRUE(cs1.is_compatible(cs2));
+}
+
 class TestNetworkInterface : public ::testing::Test {
 public:
   TestNetworkInterface() {
     robot_state = state_representation::CartesianState::Random("ee", "robot");
     robot_joint_state = state_representation::JointState::Random("robot", 3);
-    control_command = state_representation::JointState::Random("robot", 3);
+    robot_jacobian = state_representation::Jacobian::Random("robot", 3, "frame");
+    robot_mass.set_value(Eigen::MatrixXd::Random(3, 3));
+    control_joint_state = state_representation::JointState::Random("robot", 3);
     control_type = std::vector<int>{1, 2, 3};
   }
 
   state_representation::CartesianState robot_state;
   state_representation::JointState robot_joint_state;
-  state_representation::JointState control_command;
+  state_representation::Jacobian robot_jacobian;
+  state_representation::Parameter<Eigen::MatrixXd> robot_mass = state_representation::Parameter<Eigen::MatrixXd>("robot");
+  state_representation::JointState control_joint_state;
   std::vector<int> control_type;
 
   std::thread spawn_robot() {
@@ -32,13 +46,14 @@ public:
     network_interfaces::zmq::StateMessage state;
     state.ee_state = robot_state;
     state.joint_state = robot_joint_state;
+    state.jacobian = robot_jacobian;
+    state.mass = robot_mass;
     for (std::size_t i = 0; i < 100; ++i) {
       network_interfaces::zmq::send(state, state_publisher);
       network_interfaces::zmq::receive(command, command_subscriber);
       usleep(10000);
     }
-    EXPECT_TRUE(command.joint_state.data().isApprox(control_command.data()));
-    EXPECT_TRUE(command.joint_state.is_compatible(control_command));
+    expect_joint_state_equal(command.joint_state, control_joint_state);
     for (std::size_t i = 0; i < control_type.size(); ++i) {
       EXPECT_EQ(control_type.at(i), command.control_type.at(i));
     }
@@ -57,17 +72,19 @@ public:
 
     network_interfaces::zmq::StateMessage state;
     network_interfaces::zmq::CommandMessage command;
-    command.joint_state = control_command;
+    command.joint_state = control_joint_state;
     command.control_type = control_type;
     for (std::size_t i = 0; i < 100; ++i) {
       network_interfaces::zmq::send(command, command_publisher);
       network_interfaces::zmq::receive(state, state_subscriber);
       usleep(10000);
     }
-    EXPECT_TRUE(state.ee_state.data().isApprox(robot_state.data()));
-    EXPECT_TRUE(state.ee_state.is_compatible(robot_state));
-    EXPECT_TRUE(state.joint_state.data().isApprox(robot_joint_state.data()));
-    EXPECT_TRUE(state.joint_state.is_compatible(robot_joint_state));
+    expect_cart_state_equal(state.ee_state, robot_state);
+    expect_joint_state_equal(state.joint_state, robot_joint_state);
+    EXPECT_TRUE(state.jacobian.data().isApprox(robot_jacobian.data()));
+    EXPECT_TRUE(state.jacobian.is_compatible(robot_jacobian));
+    EXPECT_TRUE(state.mass.get_value().isApprox(robot_mass.get_value()));
+    EXPECT_TRUE(state.mass.is_compatible(robot_mass));
   }
 };
 
