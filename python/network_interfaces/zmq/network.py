@@ -88,7 +88,7 @@ def configure_subscriber(context, subscriber_uri, bind=False):
 
     :param context: The ZMQ context object
     :param subscriber_uri: The URI (IP:Port) of the network socket
-    :param bind: Optional flag to decide if subscriber should bind or connect
+    :param bind: Optional flag to decide if subscriber should bind (True) or connect (False)
     :type context: zmq.Context
     :type subscriber_uri: str
     :type bind: bool
@@ -111,7 +111,7 @@ def configure_publisher(context, publisher_uri, bind=True):
 
     :param context: The ZMQ context object
     :param publisher_uri: The URI (IP:Port) of the network socket
-    :param bind: Optional flag to decide if publisher should bind or connect
+    :param bind: Optional flag to decide if publisher should bind (True) or connect (False)
     :type context: zmq.Context
     :type publisher_uri: str
     :return: The publication socket that is used to send messages
@@ -132,8 +132,8 @@ def configure_sockets(context, subscriber_uri, publisher_uri, bind_subscriber=Fa
     :param context: The ZMQ context object
     :param subscriber_uri: The URI (IP:Port) of the network socket
     :param publisher_uri: The URI (IP:Port) of the network socket
-    :param bind_subscriber: Optional flag to decide if subscriber should bind or connect
-    :param bind_publisher: Optional flag to decide if publisher should bind or connect
+    :param bind_subscriber: Optional flag to decide if subscriber should bind (True) or connect (False)
+    :param bind_publisher: Optional flag to decide if publisher should bind (True) or connect (False)
     :type context: zmq.Context
     :type subscriber_uri: str
     :type publisher_uri: str

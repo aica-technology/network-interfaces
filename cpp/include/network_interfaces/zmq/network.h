@@ -90,7 +90,7 @@ inline CommandMessage decode_command(const std::vector<std::string>& message) {
  * @param context The ZMQ context object
  * @param[in,out] subscriber The subscription socket that is used to receive messages
  * @param subscriber_uri The URI (IP:Port) of the network socket
- * @param bind_subscriber Optional flag to decide if subscriber should bind or connect
+ * @param bind_subscriber Optional flag to decide if subscriber should bind (true) or connect (false)
  */
 inline void configure_subscriber(
     ::zmq::context_t& context, ::zmq::socket_t& subscriber, const std::string& subscriber_uri,
@@ -111,7 +111,7 @@ inline void configure_subscriber(
  * @param context The ZMQ context object
  * @param[in,out] publisher The publication socket that is used to send messages
  * @param publisher_uri The URI (IP:Port) of the network socket
- * @param bind_publisher Optional flag to decide if publisher should bind or connect
+ * @param bind_publisher Optional flag to decide if publisher should bind (true) or connect (false)
  */
 inline void configure_publisher(
     ::zmq::context_t& context, ::zmq::socket_t& publisher, const std::string& publisher_uri, bool bind_publisher = true
@@ -131,8 +131,8 @@ inline void configure_publisher(
  * @param subscriber_uri The URI (IP:Port) of the subscribing network socket
  * @param[in,out] publisher The publication socket that is used to send messages
  * @param publisher_uri The URI (IP:Port) of the publishing network socket
- * @param bind_subscriber Optional flag to decide if subscriber should bind or connect
- * @param bind_publisher Optional flag to decide if publisher should bind or connect
+ * @param bind_subscriber Optional flag to decide if subscriber should bind (true) or connect (false)
+ * @param bind_publisher Optional flag to decide if publisher should bind (true) or connect (false)
  */
 inline void configure_sockets(
     ::zmq::context_t& context, ::zmq::socket_t& subscriber, const std::string& subscriber_uri,
