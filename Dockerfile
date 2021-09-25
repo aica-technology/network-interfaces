@@ -1,5 +1,5 @@
 ARG ROS_VERSION=foxy
-FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION} as core-dependencies
+FROM ghcr.io/aica-technology/ros2-control-libraries:${ROS_VERSION} AS core-dependencies
 
 RUN sudo apt-get update && sudo apt-get install -y \
   libmbedtls-dev \
@@ -21,8 +21,13 @@ RUN rm -rf cppzmq*
 RUN pip3 install pyzmq
 
 WORKDIR ${HOME}
-COPY --chown=${USER} ./python ./python
-RUN pip3 install -e ./python
 
 # Clean image
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
+
+FROM core-dependencies AS build-test
+
+COPY ./ ./
+RUN cd cpp && mkdir build && cd build && cmake -DBUILD_TESTING=ON .. \
+  && make -j all && CTEST_OUTPUT_ON_FAILURE=1 make test
+RUN cd python && pip install ./ && python3 -m unittest discover ./network_interfaces/tests --verbose

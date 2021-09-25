@@ -41,10 +41,12 @@ class TestNetworkInterface(unittest.TestCase):
 
         state = network.StateMessage(self.robot_state, self.robot_joint_state, self.robot_jacobian, self.robot_mass)
         command = []
-        for i in range(100):
+        for i in range(200):
             network.send_state(state, state_publisher)
             command = network.receive_command(command_subscriber)
             time.sleep(0.01)
+        command_subscriber.close()
+        state_publisher.close()
         self.received_command = command
 
     def control(self):
@@ -53,10 +55,12 @@ class TestNetworkInterface(unittest.TestCase):
 
         command = network.CommandMessage(self.control_type, self.control_command)
         state = []
-        for i in range(100):
+        for i in range(200):
             network.send_command(command, command_publisher)
             state = network.receive_state(state_subscriber)
             time.sleep(0.01)
+        state_subscriber.close()
+        command_publisher.close()
         self.received_state = state
 
     def test_communication(self):
