@@ -31,7 +31,7 @@ struct StateMessage {
     os << "-" << std::endl;
     os << message.jacobian << std::endl;
     os << "-" << std::endl;
-    os << message.mass << std::endl;
+    os << message.mass;
     return os;
   }
 };
@@ -52,7 +52,7 @@ struct CommandMessage {
       os << control_type_t(i) << " | ";
     }
     os << std::endl << "-" << std::endl;
-    os << message.joint_state << std::endl;
+    os << message.joint_state;
     return os;
   }
 };
