@@ -24,7 +24,6 @@ else()
 endif()
 
 find_library(clproto REQUIRED)
-find_library(protobuf REQUIRED)
 find_library(state_representation REQUIRED)
 
 find_package(cppzmq REQUIRED)
@@ -38,7 +37,6 @@ install(DIRECTORY include/
 )
 
 if(BUILD_TESTING)
-    link_directories(/usr/local/lib)
     add_executable(test_communication test/test_communication.cpp)
     target_link_libraries(test_communication ${GTEST_LIBRARIES} pthread)
     add_test(NAME test_communication COMMAND test_communication)
