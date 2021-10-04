@@ -44,18 +44,18 @@ python3 zmq_loopback_state.py state_uri command_uri
 python3 zmq_loopback_command.py state_uri command_uri
 ```
 
-Note that the scripts are provided with a correct combination of state and command URIs. To illustrate that better,
-there are a few examples of such combinations below. Imagine the robot state is on port 1601 and the command on 1602:
+Note that the scripts are provided with a correct combination of state and command URIs. There are examples of such
+combinations below. Assume the robot state is on port 1601 and the command on 1602:
 
 #### Everything runs in once container / on the same host (network independent)
 
 If all applications run in the same container, or on the same host, the situation is:
 
 - The robot publishes its state on `0.0.0.0:1601` and listens to commands on `0.0.0.0:1602` with both sockets
-  non-binding: run `./zmq_loopback_state *:1601 *:1602` or `
-  python3 zmq_loopback_state.py *:1601 *:1602` to receive and print the robot's state.
+  non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to receive and
+  print the robot's state.
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
- run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
   python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
@@ -65,11 +65,11 @@ Same as above.
 
 #### One container with host (container not on host network)
 
-The container is an SSH server or needs to be on a user-defined network, but the robot is connected directly to
-the host machine. This is almost the same case as above:
+The container is an SSH server or needs to be on a user-defined network, but the robot is connected directly to the host
+machine. This is almost the same case as above:
 
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding. In that
-  case, run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
+- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
   python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
@@ -83,10 +83,10 @@ of the binding sockets. For example, if the containers are running on network *a
 *controller*, respectively.
 
 - The robot publishes its state on `controller.aicanet:1601` and listens to commands on `controller.aicanet:1602` with
-  both sockets non-binding. In that case, run `./zmq_loopback_state *:1601 *:1602` or `
-  python3 zmq_loopback_state.py *:1601 *:1602` to receive and print the robot's state.
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding. In that
-  case, run `./zmq_loopback_command controller.aicanet:1601 controller.aicanet:1602` or `
+  both sockets non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to
+  receive and print the robot's state.
+- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
+  run `./zmq_loopback_command controller.aicanet:1601 controller.aicanet:1602` or `
   python3 zmq_loopback_command.py controller.aicanet:1601 controller.aicanet:1602` to receive and print the command and
   send back a random state.
 
