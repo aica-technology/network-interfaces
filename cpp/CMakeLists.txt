@@ -36,9 +36,14 @@ install(DIRECTORY include/
         DESTINATION include
 )
 
+add_executable(zmq_loopback_state scripts/zmq_loopback_state.cpp)
+target_link_libraries(zmq_loopback_state clproto cppzmq state_representation)
+
+add_executable(zmq_loopback_command scripts/zmq_loopback_command.cpp)
+target_link_libraries(zmq_loopback_command clproto cppzmq state_representation)
+
 if(BUILD_TESTING)
     add_executable(test_communication test/test_communication.cpp)
-    target_link_libraries(test_communication ${GTEST_LIBRARIES} pthread)
+    target_link_libraries(test_communication ${GTEST_LIBRARIES} pthread clproto cppzmq state_representation)
     add_test(NAME test_communication COMMAND test_communication)
-    target_link_libraries(test_communication clproto cppzmq state_representation)
 endif()
