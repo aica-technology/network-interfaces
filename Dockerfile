@@ -29,4 +29,4 @@ FROM core-dependencies as build-test
 
 COPY ./ ./
 RUN cd cpp && mkdir build && cd build && cmake -DBUILD_TESTING=ON .. && make && CTEST_OUTPUT_ON_FAILURE=1 make test
-RUN cd python && pip install ./ && python3 -m unittest discover ./tests --verbose
+RUN cd python && pip install ./ && python3 -m unittest discover ./test --verbose
