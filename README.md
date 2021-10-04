@@ -47,7 +47,7 @@ python3 zmq_loopback_command.py state_uri command_uri
 Note that the scripts are provided with a correct combination of state and command URIs. There are examples of such
 combinations below. Assume the robot state is on port 1601 and the command on 1602:
 
-#### Everything runs in once container / on the same host (network independent)
+#### Everything runs in one container / on the same host (network independent)
 
 If all applications run in the same container, or on the same host, the situation is:
 
@@ -55,8 +55,8 @@ If all applications run in the same container, or on the same host, the situatio
   non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to receive and
   print the robot's state.
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
-  python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or 
+  `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
 #### One or more containers and host, all on host network and with no hostname
@@ -69,8 +69,8 @@ The container is an SSH server or needs to be on a user-defined network, but the
 machine. This is almost the same case as above:
 
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
-  python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or 
+  `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
 There is one important difference though: The container needs to bind ports 1601 and 1602 (i.e.
