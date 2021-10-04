@@ -27,7 +27,7 @@ cd path/to/network-interfaces/python && pip3 install ./
 
 ### ZMQ loopback scripts
 
-Both the C++ and Python directory contain *loopback* executables that simply subscribe to the state (or command)
+Both the C++ and Python directory contain *loopback* executables that subscribe to the state (or command)
 and publish a command (or state) in and endless loop. They can be used to check if the robot and the user are connected
 and receive each other's messages correctly. To run the scripts, make the CMake project and/or install the Python
 project, and then choose one of the following:
@@ -44,18 +44,18 @@ python3 zmq_loopback_state.py state_uri command_uri
 python3 zmq_loopback_command.py state_uri command_uri
 ```
 
-Note that the scripts have provided with a correct combination of state and command URIs. To illustrate that better,
+Note that the scripts are provided with a correct combination of state and command URIs. To illustrate that better,
 there are a few examples of such combinations below. Imagine the robot state is on port 1601 and the command on 1602:
 
 #### Everything runs in once container / on the same host (network independent)
 
-If all applications run in the same container, or on the same host, the situation is pretty simple:
+If all applications run in the same container, or on the same host, the situation is:
 
 - The robot publishes its state on `0.0.0.0:1601` and listens to commands on `0.0.0.0:1602` with both sockets
-  non-binding. In that case, run `./zmq_loopback_state *:1601 *:1602` or `
+  non-binding: run `./zmq_loopback_state *:1601 *:1602` or `
   python3 zmq_loopback_state.py *:1601 *:1602` to receive and print the robot's state.
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding. In that
-  case, run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
+- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
+ run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or `
   python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
@@ -65,7 +65,7 @@ Same as above.
 
 #### One container with host (container not on host network)
 
-Imagine the container is an SSH server or needs to be on a user-defined network, but the robot is connected directly to
+The container is an SSH server or needs to be on a user-defined network, but the robot is connected directly to
 the host machine. This is almost the same case as above:
 
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding. In that
@@ -79,7 +79,7 @@ add `-p1601:1601 -p1602:1602` to the `docker run` command) explicitly such that 
 #### Several containers, user-defined bridge network with hostnames
 
 If the containers all run on a user-defined bridge network, the connecting sockets need to be provided with the hostname
-of the binding sockets. Imagine the containers are running on network *aicanet* and have hostnames *robot* and
+of the binding sockets. For example, if the containers are running on network *aicanet* and have hostnames *robot* and
 *controller*, respectively.
 
 - The robot publishes its state on `controller.aicanet:1601` and listens to commands on `controller.aicanet:1602` with
@@ -92,13 +92,13 @@ of the binding sockets. Imagine the containers are running on network *aicanet* 
 
 #### Note
 
-- There are certainly other combinations possible, this is just a list of the most common ones.
-- The binding sockets always have a URI like `*:port` whilst the connecting sockets need to provide the more precise
+- This list of combinations is not exhaustive.
+- The binding sockets always have a URI like `*:port` whilst the connecting sockets need to provide the complete address
   version (`0.0.0.0:port` if on localhost or `hostname.network:port` if on bridge network).
 
 ## Development
 
-To build and run a Docker container as an SSH toolchain server for remote development with
+Build and run a Docker container as an SSH toolchain server for remote development with:
 
 ```console
 bash build.sh
