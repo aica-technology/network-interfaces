@@ -10,7 +10,7 @@ from numpy.testing import assert_array_almost_equal
 from network_interfaces.zmq import network
 
 
-class TestNetworkInterface(unittest.TestCase):
+class TestZMQNetworkInterface(unittest.TestCase):
     robot_state = None
     robot_joint_state = None
     robot_jacobian = None
