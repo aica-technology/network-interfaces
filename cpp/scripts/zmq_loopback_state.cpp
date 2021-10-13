@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
   std::vector<double> gains = {50.0, 50.0, 50.0, 10.0, 10.0, 10.0};
   dynamical_systems::Linear<state_representation::CartesianState> linear_ds(target, gains);
 
-  controllers::impedance::CartesianTwistController ctrl(5, 5, 1, 1);
+  controllers::impedance::CartesianTwistController ctrl(2, 2, .5, .5);
 
   while (true) {
     if (network_interfaces::zmq::receive(state, subscriber)) {
