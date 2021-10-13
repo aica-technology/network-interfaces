@@ -1,5 +1,8 @@
 #include <unistd.h>
 #include <state_representation/robot/JointState.hpp>
+#include <state_representation/space/cartesian/CartesianPose.hpp>
+#include <dynamical_systems/Linear.hpp>
+#include <controllers/impedance/CartesianTwistController.hpp>
 
 #include "network_interfaces/zmq/network.h"
 
@@ -20,15 +23,28 @@ int main(int argc, char** argv) {
   network_interfaces::zmq::StateMessage state;
   network_interfaces::zmq::CommandMessage command;
 
+  state_representation::CartesianPose target("panda_ee", "panda_base");
+  target.set_position(.3, .4, .5);
+  target.set_orientation(Eigen::Quaterniond(0, 1, 0, 0));
+  std::vector<double> gains = {50.0, 50.0, 50.0, 10.0, 10.0, 10.0};
+  dynamical_systems::Linear<state_representation::CartesianState> linear_ds(target, gains);
+
+  controllers::impedance::CartesianTwistController ctrl(5, 5, 1, 1);
+
   while (true) {
     if (network_interfaces::zmq::receive(state, subscriber)) {
-      std::cout << state << std::endl;
-      command.joint_state = state_representation::JointState::Zero(state.joint_state.get_name(), state.joint_state.get_names());
-      command.joint_state.set_positions(state.joint_state.get_positions());
-      command.control_type = std::vector<int>{3};
+      state_representation::CartesianTwist twist = linear_ds.evaluate(state.ee_state);
+      twist.clamp(1, 0.5);
+      state.ee_state.set_wrench(Eigen::VectorXd::Zero(6));
+      state_representation::JointTorques torques = ctrl.compute_command(twist, state.ee_state, state.jacobian);
+      command.joint_state = state.joint_state;
+      command.joint_state.set_torques(torques.data());
+//      command.joint_state.set_torques(Eigen::VectorXd::Zero(7));
+//      command.joint_state.set_torques(state.jacobian.data().colPivHouseholderQr().solve(twist.data()));
+      command.control_type = std::vector<int>{4};
       network_interfaces::zmq::send(command, publisher);
     }
-    usleep(100000);
+    usleep(10000);
   }
 
   return 0;

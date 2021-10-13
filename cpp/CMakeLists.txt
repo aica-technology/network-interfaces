@@ -25,6 +25,8 @@ endif()
 
 find_library(clproto REQUIRED)
 find_library(state_representation REQUIRED)
+find_library(controller REQUIRED)
+find_library(dynamical_systems REQUIRED)
 
 find_package(cppzmq REQUIRED)
 
@@ -37,7 +39,7 @@ install(DIRECTORY include/
 )
 
 add_executable(zmq_loopback_state scripts/zmq_loopback_state.cpp)
-target_link_libraries(zmq_loopback_state clproto cppzmq state_representation)
+target_link_libraries(zmq_loopback_state clproto cppzmq state_representation controllers dynamical_systems)
 
 add_executable(zmq_loopback_command scripts/zmq_loopback_command.cpp)
 target_link_libraries(zmq_loopback_command clproto cppzmq state_representation)
