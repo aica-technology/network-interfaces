@@ -7,9 +7,7 @@ IMAGE_STAGE=core-dependencies
 SERVE_REMOTE=false
 REMOTE_SSH_PORT=4420
 
-BUILD_FLAGS=()
-
-HELP_MESSAGE="Usage: ./build.sh [-t] [-r] [-v] [-s]
+HELP_MESSAGE="Usage: ./build-server.sh [-t] [-r] [-v] [-s]
 
 Build a Docker container for remote development and/or running unittests.
 
@@ -26,6 +24,7 @@ Options:
   -h, --help               Show this help message.
 "
 
+BUILD_FLAGS=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
     -t|--test) IMAGE_STAGE=build-test; shift 1;;
