@@ -101,8 +101,7 @@ of the binding sockets. For example, if the containers are running on network *a
 Build and run a Docker container as an SSH toolchain server for remote development with:
 
 ```console
-bash build.sh
-aica-docker server aica-technology/network-interfaces:core-dependencies -u ros2 -p 8010
+bash build-server.sh -s
 ```
 
 Note: This requires the installation of the `aica-docker` scripts
