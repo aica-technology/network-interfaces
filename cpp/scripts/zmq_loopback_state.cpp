@@ -39,9 +39,12 @@ int main(int argc, char** argv) {
       state_representation::JointTorques torques = ctrl.compute_command(twist, state.ee_state, state.jacobian);
       command.joint_state = state.joint_state;
       command.joint_state.set_torques(torques.data());
-//      command.joint_state.set_torques(Eigen::VectorXd::Zero(7));
-//      command.joint_state.set_torques(state.jacobian.data().colPivHouseholderQr().solve(twist.data()));
       command.control_type = std::vector<int>{4};
+//      command.joint_state.set_velocities(state.jacobian.data().colPivHouseholderQr().solve(twist.data()));
+//      command.control_type = std::vector<int>{2};
+//      command.joint_state.set_positions(
+//          state.joint_state.get_positions() + 0.01 * state.jacobian.data().colPivHouseholderQr().solve(twist.data()));
+//      command.control_type = std::vector<int>{1};
       network_interfaces::zmq::send(command, publisher);
     }
     usleep(10000);
