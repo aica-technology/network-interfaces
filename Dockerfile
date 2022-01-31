@@ -12,7 +12,7 @@ RUN mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j inst
 
 WORKDIR /tmp
 ARG CONTROL_LIBRARIES_BRANCH=develop
-RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --single-branch https://github.com/epfl-lasa/control-libraries.git
+RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --depth 1 https://github.com/epfl-lasa/control-libraries.git
 RUN cd control-libraries/source && sudo ./install.sh --auto --no-controllers --no-dynamical-systems --no-robot-model
 RUN cd control-libraries/protocol && sudo ./install.sh --auto
 RUN pip3 install control-libraries/python
