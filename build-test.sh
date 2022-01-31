@@ -1,23 +1,18 @@
 #!/bin/bash
-ROS_VERSION=foxy
+CONTROL_LIBRARIES_BRANCH=develop
 
 IMAGE_NAME=aica-technology/network-interfaces
-IMAGE_STAGE=core-dependencies
+IMAGE_STAGE=build-test
 
 BUILD_FLAGS=()
 
-HELP_MESSAGE="Usage: ./build.sh [--rebuild] [--test] [--verbose]
+HELP_MESSAGE="Usage: ./build.sh [-r] [-v]
 
-Build a Docker container for remote development and/or running unittests.
-
+Build a Docker container for running unittests.
 Options:
   -r, --rebuild            Rebuild the image with no cache.
-
-  -t, --test               Build and run all the unittests.
-
   -v, --verbose            Show all the output of the Docker
-                           build process
-
+                           build process.
   -h, --help               Show this help message."
 
 while [ "$#" -gt 0 ]; do
@@ -30,9 +25,9 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-BUILD_FLAGS+=(--build-arg ROS_VERSION="${ROS_VERSION}")
+BUILD_FLAGS+=(--build-arg CONTROL_LIBRARIES_BRANCH="${CONTROL_LIBRARIES_BRANCH}")
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_STAGE}")
 BUILD_FLAGS+=(--target "${IMAGE_STAGE}")
 
-docker pull ghcr.io/aica-technology/ros2-control-libraries:"${ROS_VERSION}"
+docker pull ghcr.io/epfl-lasa/control-libraries/development-dependencies || exit 1
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" .
