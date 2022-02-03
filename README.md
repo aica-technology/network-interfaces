@@ -2,28 +2,18 @@
 
 A repository of drivers, protocols and libraries for communicating between software and hardware devices.
 
-## Usage
+## Installation and usage
 
-Use the C++ projects in one of the two following ways:
-
-- Include the `include` directory of the network interface library in another `CMakeLists.txt` with
-  ```cmake
-  include_directories(path/to/network-interfaces/cpp/include)
-  ```
-- Install the network interface library to `/usr/local/include` with
-  ```console
-  cd path/to/network-interfaces/cpp && mkdir build && cd build && cmake .. && make install
-  ```
-  and use it in another `CMakeLists.txt` with
-  ```cmake
-  find_library(network_interfaces REQUIRED)
-  ```
-
-For Python, install the library simply with
+This project depends on the `state_representation` and `clproto` libraries from
+[control libraries](https://github.com/epfl-lasa/control-libraries) in C++ as well as Python. Before installing the
+network interfaces libraries, install therefore the two modules mentioned above as well as their Python bindings.
+Afterwards, the installation is straight forward:
 
 ```console
-cd path/to/network-interfaces/python && pip3 install ./
+[sudo] bash install.sh -y
 ```
+
+Run `bash install.sh -h` for help with this process.
 
 ### ZMQ loopback scripts
 
@@ -33,8 +23,6 @@ and receive each other's messages correctly. To run the scripts, make the CMake 
 project, and then choose one of the following:
 
 ```
-bash build.sh -t
-aica-docker interactive aica-technology/network-interfaces:build-test -u ros2
 cd path/to/cpp/build
 ./zmq_loopback_state state_uri command_uri
 ./zmq_loopback_command state_uri command_uri
@@ -55,7 +43,7 @@ If all applications run in the same container, or on the same host, the situatio
   non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to receive and
   print the robot's state.
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or 
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or
   `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
@@ -69,7 +57,7 @@ The container is an SSH server or needs to be on a user-defined network, but the
 machine. This is almost the same case as above:
 
 - The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or 
+  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or
   `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
   state.
 
@@ -101,14 +89,14 @@ of the binding sockets. For example, if the containers are running on network *a
 Build and run a Docker container as an SSH toolchain server for remote development with:
 
 ```console
-bash build-server.sh -s
+bash dev-server.sh
 ```
 
 Note: This requires the installation of the `aica-docker` scripts
 from [here](https://github.com/aica-technology/docker-images).
 
-Additionally, to run the tests without an SSH toolchain server, build the image with the `--test` option:
+Additionally, to run the tests without an SSH toolchain server, build an image with:
 
 ```console
-bash build.sh --test
+bash build-test.sh
 ```
