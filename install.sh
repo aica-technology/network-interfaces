@@ -22,7 +22,6 @@ Options:
   -h, --help               Show this help message."
 
 function install_cppzmq() {
-  echo ">>> INSTALLING ZMQ DEPENDENCIES"
   apt-get update && apt-get install "${AUTO_INSTALL}" libmbedtls-dev libsodium-dev libzmq3-dev || exit 1
 
   mkdir -p "${SCRIPT_DIR}"/install
@@ -34,6 +33,8 @@ function install_cppzmq() {
   cd "${SCRIPT_DIR}"/install/cppzmq-"${CPPZMQ_VERSION}" || exit 1
   mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install || exit 1
   ldconfig
+
+  pip3 install pyzmq
 
   cd "${SCRIPT_DIR}" && rm -rf "${SCRIPT_DIR}"/install || exit 1
 }
@@ -101,12 +102,8 @@ if [ -z "${CL_PYTHON_BINDINGS}" ]; then
   exit 1
 fi
 
-
-#ZMQ_INSTALL=$(ldconfig -p | grep libclproto)
-#if [ -z "${ZMQ_INSTALL}" ]; then
-  echo ">>> CPPZMQ PACKAGE NOT FOUND!"
-  install_cppzmq || exit 1
-#fi
+echo ">>> INSTALLING ZMQ DEPENDENCIES"
+install_cppzmq || exit 1
 
 echo ">>> INSTALLING NETWORK INTERFACES"
 install_network_interfaces || exit 1
