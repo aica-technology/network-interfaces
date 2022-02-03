@@ -2,6 +2,8 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 INSTALL_DESTINATION="/usr/local"
+INSTALL_CPP=1
+INSTALL_PY=1
 BUILD_TESTING="OFF"
 AUTO_INSTALL=""
 CPPZMQ_VERSION=4.7.1
@@ -13,6 +15,8 @@ Options:
                            automatically approve install steps.
   -d, --dir [path]         Configure the installation directory
                            (default: ${INSTALL_DESTINATION}).
+  --no-cpp                 Exclude the cpp library.
+  --no-python              Exclude the python library.
   --build-tests            Build the unittest targets.
   --clean                  Delete any previously installed header
                            files from ${INSTALL_DESTINATION}/include and any
@@ -22,34 +26,42 @@ Options:
   -h, --help               Show this help message."
 
 function install_cppzmq() {
-  apt-get update && apt-get install "${AUTO_INSTALL}" libzmq3-dev || exit 1
+  if [ "${INSTALL_CPP}" == 1 ]; then
+    apt-get update && apt-get install "${AUTO_INSTALL}" libzmq3-dev || exit 1
 
-  mkdir -p "${SCRIPT_DIR}"/install
-  cd "${SCRIPT_DIR}"/install || exit 1
-  wget https://github.com/zeromq/cppzmq/archive/v${CPPZMQ_VERSION}.tar.gz -O cppzmq-${CPPZMQ_VERSION}.tar.gz &&
-    tar -xzf cppzmq-${CPPZMQ_VERSION}.tar.gz &&
-    rm cppzmq-${CPPZMQ_VERSION}.tar.gz
+    mkdir -p "${SCRIPT_DIR}"/install
+    cd "${SCRIPT_DIR}"/install || exit 1
+    wget https://github.com/zeromq/cppzmq/archive/v${CPPZMQ_VERSION}.tar.gz -O cppzmq-${CPPZMQ_VERSION}.tar.gz &&
+      tar -xzf cppzmq-${CPPZMQ_VERSION}.tar.gz &&
+      rm cppzmq-${CPPZMQ_VERSION}.tar.gz
 
-  cd "${SCRIPT_DIR}"/install/cppzmq-"${CPPZMQ_VERSION}" || exit 1
-  mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install || exit 1
-  ldconfig
+    cd "${SCRIPT_DIR}"/install/cppzmq-"${CPPZMQ_VERSION}" || exit 1
+    mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install || exit 1
+    ldconfig
+  fi
 
-  pip3 install pyzmq
+  if [ "${INSTALL_PY}" == 1 ]; then
+    pip3 install pyzmq
+  fi
 
   cd "${SCRIPT_DIR}" && rm -rf "${SCRIPT_DIR}"/install || exit 1
 }
 
 install_network_interfaces () {
-  cd "${SCRIPT_DIR}"/cpp && mkdir -p build && cd build || exit 1
-  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING="${BUILD_TESTING}" \
-    -DCMAKE_INSTALL_PREFIX="${INSTALL_DESTINATION}" .. || exit 1
+  if [ "${INSTALL_CPP}" == 1 ]; then
+    cd "${SCRIPT_DIR}"/cpp && mkdir -p build && cd build || exit 1
+    cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING="${BUILD_TESTING}" \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DESTINATION}" .. || exit 1
 
-  make -j && make install || exit 1
-  ldconfig
+    make -j && make install || exit 1
+    ldconfig
+  fi
 
-  cd "${SCRIPT_DIR}"/python && pip3 install ./ || exit 1
-  if [ ${BUILD_TESTING} == "ON" ]; then
-    python3 -m unittest discover ./test --verbose || exit 1
+  if [ "${INSTALL_PY}" == 1 ]; then
+    cd "${SCRIPT_DIR}"/python && pip3 install ./ || exit 1
+    if [ ${BUILD_TESTING} == "ON" ]; then
+      python3 -m unittest discover ./test --verbose || exit 1
+    fi
   fi
 
   cd "${SCRIPT_DIR}" || exit 1
@@ -71,6 +83,8 @@ while [ "$#" -gt 0 ]; do
   case "$1" in
   -y|--auto) AUTO_INSTALL="-y"; shift 1;;
   -d|--dir) INSTALL_DESTINATION=$2; shift 2;;
+  --no-cpp) INSTALL_CPP=0; shift 1;;
+  --no-python) INSTALL_PY=0; shift 1;;
   --build-tests) BUILD_TESTING="ON"; shift 1;;
   --clean) uninstall; exit 0;;
   --cleandir) INSTALL_DESTINATION=$2; uninstall; exit 0;;
