@@ -31,7 +31,7 @@ function install_cppzmq() {
     tar -xzf cppzmq-${CPPZMQ_VERSION}.tar.gz &&
     rm cppzmq-${CPPZMQ_VERSION}.tar.gz
 
-  cd "${SCRIPT_DIR}"/install/cppzmq-"${PROTOBUF_VERSION}" || exit 1
+  cd "${SCRIPT_DIR}"/install/cppzmq-"${CPPZMQ_VERSION}" || exit 1
   mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install || exit 1
   ldconfig
 
@@ -94,9 +94,9 @@ if [ -z "${CL_PROTO_INSTALL}" ]; then
   exit 1
 fi
 
-CL_PYTHON_BINDINGS=$(pip3 list | grep state_representation)
+CL_PYTHON_BINDINGS=$(pip3 list | grep control-libraries)
 if [ -z "${CL_PYTHON_BINDINGS}" ]; then
-  echo ">>> PYTHON BINDINGS FOR STATE REPRESENTATION LIBRARY NOT FOUND!"
+  echo ">>> PYTHON BINDINGS FOR CONTROL LIBRARIES NOT FOUND!"
   echo ">>> Install bindings from https://github.com/epfl-lasa/control-libraries/python"
   exit 1
 fi
