@@ -22,7 +22,7 @@ Options:
   -h, --help               Show this help message."
 
 function install_cppzmq() {
-  apt-get update && apt-get install "${AUTO_INSTALL}" libmbedtls-dev libsodium-dev libzmq3-dev || exit 1
+  apt-get update && apt-get install "${AUTO_INSTALL}" libzmq3-dev || exit 1
 
   mkdir -p "${SCRIPT_DIR}"/install
   cd "${SCRIPT_DIR}"/install || exit 1
