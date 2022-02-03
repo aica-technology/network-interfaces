@@ -87,19 +87,20 @@ if [ -z "${STATE_REPRESENTATION_INSTALL}" ]; then
   exit 1
 fi
 
-CL_PYTHON_BINDINGS=$(python3 -c "import state_representation")
-if [ "${CL_PYTHON_BINDINGS}" == 1 ]; then
-  echo ">>> PYTHON BINDINGS FOR STATE REPRESENTATION LIBRARY NOT FOUND!"
-  echo ">>> Install bindings from https://github.com/epfl-lasa/control-libraries/python"
-  exit 1
-fi
-
 CL_PROTO_INSTALL=$(ldconfig -p | grep libclproto)
 if [ -z "${CL_PROTO_INSTALL}" ]; then
   echo ">>> CL PROTO LIBRARY NOT FOUND!"
   echo ">>> Install clproto from https://github.com/epfl-lasa/control-libraries/protocol"
   exit 1
 fi
+
+CL_PYTHON_BINDINGS=$(pip3 list | grep state_representation)
+if [ -z "${CL_PYTHON_BINDINGS}" ]; then
+  echo ">>> PYTHON BINDINGS FOR STATE REPRESENTATION LIBRARY NOT FOUND!"
+  echo ">>> Install bindings from https://github.com/epfl-lasa/control-libraries/python"
+  exit 1
+fi
+
 
 #ZMQ_INSTALL=$(ldconfig -p | grep libclproto)
 #if [ -z "${ZMQ_INSTALL}" ]; then
