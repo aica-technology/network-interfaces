@@ -1,6 +1,9 @@
 FROM ghcr.io/epfl-lasa/control-libraries/development-dependencies as source-dependencies
 
-RUN apt-get update && apt-get install -y libzmq3-dev \
+RUN apt-get update && apt-get install -y \
+  featherpad \
+  libzmq3-dev \
+  nano \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
