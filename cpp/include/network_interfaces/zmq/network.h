@@ -2,8 +2,8 @@
 
 #include <clproto.h>
 #include <state_representation/space/cartesian/CartesianState.hpp>
-#include <state_representation/robot/JointState.hpp>
-#include <state_representation/robot/Jacobian.hpp>
+#include <state_representation/space/joint/JointState.hpp>
+#include <state_representation/space/Jacobian.hpp>
 #include <state_representation/parameters/Parameter.hpp>
 #include <zmq.hpp>
 
