@@ -9,7 +9,7 @@ setuptools.setup(
     url="https://github.com/aica-technology/network-interfaces",
     packages=setuptools.find_packages(),
     install_requires=[
-        "control-libraries>=4.0.0",
+        "control-libraries>=5.0.0",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

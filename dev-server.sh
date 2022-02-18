@@ -1,5 +1,5 @@
 #!/bin/bash
-CONTROL_LIBRARIES_BRANCH=develop
+CONTROL_LIBRARIES_BRANCH=v5.0.0
 REMOTE_SSH_PORT=4420
 
 IMAGE_NAME=aica-technology/network-interfaces
