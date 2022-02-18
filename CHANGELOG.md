@@ -2,8 +2,14 @@
 
 Release Versions:
 
+- [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 1.0.0
+
+Version 1.0.0 accounts for breaking changes in control libraries and defines 5.0.0 as the required control libraries
+version. Additionally, there is now an install script that takes care of the installation of network interfaces.
 
 ## 0.2.0
 
