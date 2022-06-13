@@ -16,10 +16,10 @@ class StateMessage:
     ee_state: sr.CartesianState
     joint_state: sr.JointState
     jacobian: sr.Jacobian
-    mass: sr.Parameter("mass", sr.StateType.PARAMETER_MATRIX)
+    mass: sr.Parameter("mass", sr.ParameterType.MATRIX)
 
     def __init__(self, ee_state=sr.CartesianState(), joint_state=sr.JointState(), jacobian=sr.Jacobian(),
-                 mass=sr.Parameter("mass", sr.StateType.PARAMETER_MATRIX)):
+                 mass=sr.Parameter("mass", sr.ParameterType.MATRIX)):
         assert isinstance(ee_state, sr.CartesianState)
         assert isinstance(joint_state, sr.JointState)
         assert isinstance(jacobian, sr.Jacobian)
@@ -84,7 +84,7 @@ def encode_command(command):
         if command.control_type[i] >= ControlType.END.value:
             raise ValueError("The desired 'control_type' of the CommandMessage is unknown.")
     encoded_command = list()
-    control_type_param = sr.Parameter("control_type", command.control_type, sr.StateType.PARAMETER_INT_ARRAY)
+    control_type_param = sr.Parameter("control_type", command.control_type, sr.ParameterType.INT_ARRAY)
     encoded_command.append(clproto.encode(control_type_param, clproto.MessageType.PARAMETER_MESSAGE))
     encoded_command.append(clproto.encode(command.joint_state, clproto.MessageType.JOINT_STATE_MESSAGE))
     return encoded_command
