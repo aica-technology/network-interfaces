@@ -21,7 +21,7 @@ jobs:
         run: |
           IMAGE_NAME=network-interfaces:latest
           docker build . \
-            --build-arg CL_BRANCH=${{ inputs.cl_branch }} \
+            --build-arg CONTROL_LIBRARIES_BRANCH=${{ inputs.cl_branch }} \
             --tag ${IMAGE_NAME}
         shell: bash
 
