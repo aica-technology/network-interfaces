@@ -14,7 +14,7 @@ WORKDIR /tmp/cppzmq-${CPPZMQ_VERSION}
 RUN mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install
 
 WORKDIR /tmp
-ARG CONTROL_LIBRARIES_BRANCH=v5.0.0
+ARG CONTROL_LIBRARIES_BRANCH=v6.0.0
 RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --depth 1 https://github.com/epfl-lasa/control-libraries.git
 RUN cd control-libraries/source && ./install.sh --auto --no-controllers --no-dynamical-systems --no-robot-model
 RUN cd control-libraries/protocol && ./install.sh --auto
