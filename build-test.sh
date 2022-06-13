@@ -1,5 +1,5 @@
 #!/bin/bash
-CONTROL_LIBRARIES_BRANCH=v5.0.0
+CONTROL_LIBRARIES_BRANCH=v6.0.0
 
 IMAGE_NAME=aica-technology/network-interfaces
 IMAGE_STAGE=build-test

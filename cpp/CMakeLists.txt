@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15)
 project(network_interfaces VERSION 1.0.0)
 
 option(BUILD_TESTING "Build tests." OFF)
@@ -23,14 +23,11 @@ else()
     find_package(GTest QUIET)
 endif()
 
-find_library(clproto REQUIRED)
-find_library(state_representation REQUIRED)
-
+find_package(control_libraries 6.0.0 REQUIRED COMPONENTS state_representation)
+find_package(clproto 6.0.0 REQUIRED)
 find_package(cppzmq REQUIRED)
 
-include_directories(
-        include
-)
+include_directories(include)
 
 install(DIRECTORY include/
         DESTINATION include

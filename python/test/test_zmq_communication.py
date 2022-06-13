@@ -1,13 +1,11 @@
+import numpy as np
+import state_representation as sr
 import threading
 import time
 import unittest
-
-import numpy as np
-import state_representation as sr
 import zmq
-from numpy.testing import assert_array_almost_equal
-
 from network_interfaces.zmq import network
+from numpy.testing import assert_array_almost_equal
 
 
 class TestZMQNetworkInterface(unittest.TestCase):
@@ -26,7 +24,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         cls.robot_state = sr.CartesianState().Random("ee", "robot")
         cls.robot_joint_state = sr.JointState().Random("robot", 3)
         cls.robot_jacobian = sr.Jacobian().Random("robot", 3, "frame")
-        cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.StateType.PARAMETER_MATRIX)
+        cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.ParameterType.MATRIX)
         cls.control_command = sr.JointState().Random("robot", 3)
         cls.control_type = [1, 2, 3]
         cls.context = zmq.Context()
