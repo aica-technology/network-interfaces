@@ -2,9 +2,16 @@
 
 Release Versions:
 
+- [1.1.0](#110)
 - [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 1.1.0
+
+Version 1.1.0 sets control libraries version 6.0.0 as default and fixes the GitHub workflow. Additionally, the C++
+library now has its proper CMake configuration and can be included and linked with `find_package(network_interfaces)`
+and`target_link_libraries(${MY_TARGET} ${network_interfaces_LIBRARIES}`.
 
 ## 1.0.0
 
