@@ -13,7 +13,8 @@ class TestZMQNetworkInterface(unittest.TestCase):
     robot_joint_state = None
     robot_jacobian = None
     robot_mass = None
-    control_command = None
+    control_joint_command = None
+    control_ee_command = None
     control_type = None
     context = None
     received_state = None
@@ -25,7 +26,8 @@ class TestZMQNetworkInterface(unittest.TestCase):
         cls.robot_joint_state = sr.JointState().Random("robot", 3)
         cls.robot_jacobian = sr.Jacobian().Random("robot", 3, "frame")
         cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.ParameterType.MATRIX)
-        cls.control_command = sr.JointState().Random("robot", 3)
+        cls.control_joint_command = sr.JointState().Random("robot", 3)
+        cls.control_ee_command = sr.CartesianState().Random("ee", "robot")
         cls.control_type = [1, 2, 3]
         cls.context = zmq.Context()
 
@@ -52,7 +54,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         state_subscriber, command_publisher = network.configure_sockets(self.context, "127.0.0.1:1701",
                                                                         "127.0.0.1:1702")
 
-        command = network.CommandMessage(self.control_type, self.control_command)
+        command = network.CommandMessage(self.control_type, self.control_ee_command, self.control_joint_command)
         state = []
         start_time = time.time()
         while time.time() - start_time < 2.:
@@ -70,7 +72,8 @@ class TestZMQNetworkInterface(unittest.TestCase):
 
         [self.assertEqual(self.received_command.control_type[i], self.control_type[i]) for i in
          range(len(self.control_type))]
-        self.assert_state_equal(self.received_command.joint_state, self.control_command)
+        self.assert_state_equal(self.received_command.ee_state, self.control_ee_command)
+        self.assert_state_equal(self.received_command.joint_state, self.control_joint_command)
 
         self.assert_state_equal(self.received_state.ee_state, self.robot_state)
         self.assert_state_equal(self.received_state.joint_state, self.robot_joint_state)
@@ -79,10 +82,10 @@ class TestZMQNetworkInterface(unittest.TestCase):
         assert_array_almost_equal(self.received_state.mass.get_value(), self.robot_mass.get_value())
 
     def test_encode_command(self):
-        command = network.CommandMessage([], sr.JointState())
+        command = network.CommandMessage([], sr.CartesianState(), sr.JointState())
         network.encode_command(command)
 
-        command = network.CommandMessage([], sr.JointState().Random("test", 3))
+        command = network.CommandMessage([], sr.CartesianState().Random("test"), sr.JointState().Random("test", 3))
         with self.assertRaises(ValueError):
             network.encode_command(command)
 
@@ -92,7 +95,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         self.assertEqual(len(decoded.control_type), 3)
         assert_array_almost_equal(decoded.control_type, [1, 1, 1])
 
-        command.control_type = [1, 2, 6]
+        command.control_type = [1, 2, 10]
         with self.assertRaises(ValueError):
             network.encode_command(command)
 

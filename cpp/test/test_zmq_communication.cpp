@@ -96,6 +96,7 @@ public:
 
 TEST_F(TestNetworkInterface, TestEncodeCommand) {
   network_interfaces::zmq::CommandMessage command;
+  command.ee_state = state_representation::CartesianState::Random("test");
   command.joint_state = state_representation::JointState::Random("test", 3);
   command.control_type = std::vector<int>{};
   EXPECT_THROW(network_interfaces::zmq::encode_command(command),
@@ -108,7 +109,7 @@ TEST_F(TestNetworkInterface, TestEncodeCommand) {
     EXPECT_EQ(command.control_type.at(i), 1);
   }
 
-  command.control_type = std::vector<int>{1, 2, 6};
+  command.control_type = std::vector<int>{1, 2, 10};
   EXPECT_THROW(network_interfaces::zmq::encode_command(command),
                network_interfaces::zmq::exceptions::UnknownControlTypeException);
 

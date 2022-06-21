@@ -2,7 +2,7 @@ import argparse
 import time
 
 import zmq
-from state_representation import JointState
+from state_representation import CartesianState, JointState
 
 from network_interfaces.zmq import network
 
@@ -18,6 +18,8 @@ def main(state_uri, command_uri):
         state = network.receive_state(subscriber)
         if state:
             print(state)
+            command.ee_state = CartesianState().Identity(state.ee_state.get_name(), state.ee_state.get_referene_frame())
+            command.ee_state.set_pose(state.ee_state.get_pose())
             command.joint_state = JointState().Zero(state.joint_state.get_name(), state.joint_state.get_names())
             command.joint_state.set_positions(state.joint_state.get_positions())
             command.control_type = [3]

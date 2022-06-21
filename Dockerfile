@@ -28,11 +28,12 @@ RUN pip3 install pyzmq
 FROM source-dependencies as build-test
 
 WORKDIR ${HOME}
-COPY --chown=${USER} ./cpp ./network_interfaces/cpp
-COPY --chown=${USER} ./python ./network_interfaces/python
 
+COPY --chown=${USER} ./cpp ./network_interfaces/cpp
 RUN cd ./network_interfaces/cpp && mkdir build && cd build && cmake -DBUILD_TESTING=ON .. \
   && make -j && CTEST_OUTPUT_ON_FAILURE=1 make test && make -j install
+
+COPY --chown=${USER} ./python ./network_interfaces/python
 RUN cd ./network_interfaces/python && pip3 install ./ && python3 -m unittest discover ./test --verbose
 
 # Clean image

@@ -37,14 +37,17 @@ class CommandMessage:
     to the specified control type.
     """
     control_type: List[int]
+    ee_state: sr.CartesianState
     joint_state: sr.JointState
 
-    def __init__(self, control_type=None, joint_state=sr.JointState()):
+    def __init__(self, control_type=None, ee_state=sr.CartesianState(), joint_state=sr.JointState()):
         if control_type is None:
             control_type = []
         assert isinstance(control_type, list)
+        assert isinstance(ee_state, sr.CartesianState)
         assert isinstance(joint_state, sr.JointState)
         self.control_type = control_type
+        self.ee_state = ee_state
         self.joint_state = joint_state
 
 
@@ -86,6 +89,7 @@ def encode_command(command):
     encoded_command = list()
     control_type_param = sr.Parameter("control_type", command.control_type, sr.ParameterType.INT_ARRAY)
     encoded_command.append(clproto.encode(control_type_param, clproto.MessageType.PARAMETER_MESSAGE))
+    encoded_command.append(clproto.encode(command.ee_state, clproto.MessageType.CARTESIAN_STATE_MESSAGE))
     encoded_command.append(clproto.encode(command.joint_state, clproto.MessageType.JOINT_STATE_MESSAGE))
     return encoded_command
 
@@ -113,7 +117,8 @@ def decode_command(message):
     :return: The equivalent CommandMessage
     :rtype: CommandMessage
     """
-    command = CommandMessage(clproto.decode(message[0]).get_value(), clproto.decode(message[1]))
+    command = CommandMessage(clproto.decode(message[0]).get_value(), clproto.decode(message[1]),
+                             clproto.decode(message[2]))
     return command
 
 

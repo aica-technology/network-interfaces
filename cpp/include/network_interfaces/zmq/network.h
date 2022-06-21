@@ -44,6 +44,7 @@ struct StateMessage {
  */
 struct CommandMessage {
   std::vector<int> control_type;
+  state_representation::CartesianState ee_state;
   state_representation::JointState joint_state;
 
   inline friend std::ostream& operator<<(std::ostream& os, const CommandMessage& message) {
@@ -52,6 +53,8 @@ struct CommandMessage {
       os << control_type_t(i) << " | ";
     }
     os << std::endl << "-" << std::endl;
+    os << message.ee_state << std::endl;
+    os << "-" << std::endl;
     os << message.joint_state;
     return os;
   }
@@ -100,6 +103,7 @@ inline std::vector<std::string> encode_command(CommandMessage& command) {
   std::vector<std::string> encoded_command;
   encoded_command.emplace_back(
       clproto::encode(state_representation::Parameter<std::vector<int>>("control_type", command.control_type)));
+  encoded_command.emplace_back(clproto::encode(command.ee_state));
   encoded_command.emplace_back(clproto::encode(command.joint_state));
   return encoded_command;
 }
@@ -128,7 +132,8 @@ inline StateMessage decode_state(const std::vector<std::string>& message) {
 inline CommandMessage decode_command(const std::vector<std::string>& message) {
   CommandMessage command;
   command.control_type = clproto::decode<state_representation::Parameter<std::vector<int>>>(message.at(0)).get_value();
-  command.joint_state = clproto::decode<state_representation::JointState>(message.at(1));
+  command.ee_state = clproto::decode<state_representation::CartesianState>(message.at(1));
+  command.joint_state = clproto::decode<state_representation::JointState>(message.at(2));
   return command;
 }
 

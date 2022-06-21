@@ -23,7 +23,11 @@ int main(int argc, char** argv) {
   while (true) {
     if (network_interfaces::zmq::receive(state, subscriber)) {
       std::cout << state << std::endl;
-      command.joint_state = state_representation::JointState::Zero(state.joint_state.get_name(), state.joint_state.get_names());
+      command.ee_state = state_representation::CartesianState::Identity(
+          state.ee_state.get_name(), state.ee_state.get_reference_frame());
+      command.ee_state.set_pose(state.ee_state.get_pose());
+      command.joint_state =
+          state_representation::JointState::Zero(state.joint_state.get_name(), state.joint_state.get_names());
       command.joint_state.set_positions(state.joint_state.get_positions());
       command.control_type = std::vector<int>{3};
       network_interfaces::zmq::send(command, publisher);
