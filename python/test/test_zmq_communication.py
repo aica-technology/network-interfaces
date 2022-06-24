@@ -1,13 +1,11 @@
-import threading
-import time
-import unittest
-
+import concurrent.futures
 import numpy as np
 import state_representation as sr
+import time
+import unittest
 import zmq
-from numpy.testing import assert_array_almost_equal
-
 from network_interfaces.zmq import network
+from numpy.testing import assert_array_almost_equal
 
 
 class TestZMQNetworkInterface(unittest.TestCase):
@@ -26,7 +24,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         cls.robot_state = sr.CartesianState().Random("ee", "robot")
         cls.robot_joint_state = sr.JointState().Random("robot", 3)
         cls.robot_jacobian = sr.Jacobian().Random("robot", 3, "frame")
-        cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.StateType.PARAMETER_MATRIX)
+        cls.robot_mass = sr.Parameter("mass", np.random.rand(3, 3), sr.ParameterType.MATRIX)
         cls.control_command = sr.JointState().Random("robot", 3)
         cls.control_type = [1, 2, 3]
         cls.context = zmq.Context()
@@ -41,7 +39,8 @@ class TestZMQNetworkInterface(unittest.TestCase):
 
         state = network.StateMessage(self.robot_state, self.robot_joint_state, self.robot_jacobian, self.robot_mass)
         command = []
-        for i in range(200):
+        start_time = time.time()
+        while time.time() - start_time < 2.:
             network.send_state(state, state_publisher)
             command = network.receive_command(command_subscriber)
             time.sleep(0.01)
@@ -55,7 +54,8 @@ class TestZMQNetworkInterface(unittest.TestCase):
 
         command = network.CommandMessage(self.control_type, self.control_command)
         state = []
-        for i in range(200):
+        start_time = time.time()
+        while time.time() - start_time < 2.:
             network.send_command(command, command_publisher)
             state = network.receive_state(state_subscriber)
             time.sleep(0.01)
@@ -64,12 +64,9 @@ class TestZMQNetworkInterface(unittest.TestCase):
         self.received_state = state
 
     def test_communication(self):
-        robot = threading.Thread(target=self.robot)
-        control = threading.Thread(target=self.control)
-        robot.start()
-        control.start()
-        robot.join()
-        control.join()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as e:
+            e.submit(self.robot)
+            e.submit(self.control)
 
         [self.assertEqual(self.received_command.control_type[i], self.control_type[i]) for i in
          range(len(self.control_type))]
