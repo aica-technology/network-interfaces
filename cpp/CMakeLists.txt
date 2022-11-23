@@ -36,6 +36,7 @@ endmacro()
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(FindPkgConfig)
 
 add_project_dependency(control_libraries 6.0.0 REQUIRED COMPONENTS state_representation)
 add_project_dependency(clproto 6.0.0 REQUIRED)
@@ -83,13 +84,13 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-export(PACKAGE ${PROJECT_NAME})
-
-if (NOT MSVC)
+if(${PKG_CONFIG_FOUND})
   set(PKG_NAME ${PROJECT_NAME})
   set(PKG_DESC "Network Interfaces")
   set(pkg_conf_file "network_interfaces.pc")
   configure_file("${pkg_conf_file}.in" "${CMAKE_BINARY_DIR}/${pkg_conf_file}" @ONLY)
   install(FILES "${CMAKE_BINARY_DIR}/${pkg_conf_file}"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
+else()
+  message(WARNING "Could not find pkg-config executable, skipping generation of pkg-config files.")
 endif()
