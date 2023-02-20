@@ -5,7 +5,7 @@ A repository of drivers, protocols and libraries for communicating between softw
 ## Installation and usage
 
 This project depends on the `state_representation` and `clproto` libraries from
-[control libraries](https://github.com/epfl-lasa/control-libraries) in C++ as well as Python. Before installing the
+[control libraries](https://github.com/aica-technology/control-libraries) in C++ as well as Python. Before installing the
 network interfaces libraries, install therefore the two modules mentioned above as well as their Python bindings.
 Afterwards, the installation is straight forward:
 

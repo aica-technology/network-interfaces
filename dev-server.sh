@@ -29,7 +29,7 @@ BUILD_FLAGS+=(--build-arg CONTROL_LIBRARIES_BRANCH="${CONTROL_LIBRARIES_BRANCH}"
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_STAGE}")
 BUILD_FLAGS+=(--target "${IMAGE_STAGE}")
 
-docker pull ghcr.io/epfl-lasa/control-libraries/development-dependencies || exit 1
+docker pull ghcr.io/aica-technology/control-libraries/development-dependencies || exit 1
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" . || exit 1
 
 aica-docker server "${IMAGE_NAME}:${IMAGE_STAGE}" -u developer -p "${REMOTE_SSH_PORT}"

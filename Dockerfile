@@ -1,4 +1,4 @@
-FROM ghcr.io/epfl-lasa/control-libraries/development-dependencies as source-dependencies
+FROM ghcr.io/aica-technology/control-libraries/development-dependencies as source-dependencies
 
 RUN apt-get update && apt-get install -y \
   featherpad \
@@ -15,7 +15,7 @@ RUN mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j inst
 
 WORKDIR /tmp
 ARG CONTROL_LIBRARIES_BRANCH=v6.0.0
-RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --depth 1 https://github.com/epfl-lasa/control-libraries.git
+RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --depth 1 https://github.com/aica-technology/control-libraries.git
 RUN cd control-libraries/source && ./install.sh --auto --no-controllers --no-dynamical-systems --no-robot-model
 RUN cd control-libraries/protocol && ./install.sh --auto
 RUN pip3 install control-libraries/python
