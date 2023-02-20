@@ -30,7 +30,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         cls.context = zmq.Context()
 
     def assert_state_equal(self, state1, state2):
-        self.assertTrue(state1.is_compatible(state2))
+        self.assertFalse(state1.is_incompatible(state2))
         assert_array_almost_equal(state1.data(), state2.data())
 
     def robot(self):
@@ -75,7 +75,7 @@ class TestZMQNetworkInterface(unittest.TestCase):
         self.assert_state_equal(self.received_state.ee_state, self.robot_state)
         self.assert_state_equal(self.received_state.joint_state, self.robot_joint_state)
         self.assert_state_equal(self.received_state.jacobian, self.robot_jacobian)
-        self.assertTrue(self.received_state.mass.is_compatible(self.robot_mass))
+        self.assertFalse(self.received_state.mass.is_incompatible(self.robot_mass))
         assert_array_almost_equal(self.received_state.mass.get_value(), self.robot_mass.get_value())
 
     def test_encode_command(self):

@@ -98,21 +98,21 @@ done
 STATE_REPRESENTATION_INSTALL=$(ldconfig -p | grep libstate_representation)
 if [ -z "${STATE_REPRESENTATION_INSTALL}" ]; then
   echo ">>> STATE REPRESENTATION LIBRARY NOT FOUND!"
-  echo ">>> Install state_representation from https://github.com/epfl-lasa/control-libraries/source"
+  echo ">>> Install state_representation from https://github.com/aica-technology/control-libraries/source"
   exit 1
 fi
 
 CL_PROTO_INSTALL=$(ldconfig -p | grep libclproto)
 if [ -z "${CL_PROTO_INSTALL}" ]; then
   echo ">>> CL PROTO LIBRARY NOT FOUND!"
-  echo ">>> Install clproto from https://github.com/epfl-lasa/control-libraries/protocol"
+  echo ">>> Install clproto from https://github.com/aica-technology/control-libraries/protocol"
   exit 1
 fi
 
 CL_PYTHON_BINDINGS=$(pip3 list | grep control-libraries)
 if [ -z "${CL_PYTHON_BINDINGS}" ]; then
   echo ">>> PYTHON BINDINGS FOR CONTROL LIBRARIES NOT FOUND!"
-  echo ">>> Install bindings from https://github.com/epfl-lasa/control-libraries/python"
+  echo ">>> Install bindings from https://github.com/aica-technology/control-libraries/python"
   exit 1
 fi
 
