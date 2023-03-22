@@ -38,8 +38,8 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FindPkgConfig)
 
-add_project_dependency(control_libraries 6.0.0 REQUIRED COMPONENTS state_representation)
-add_project_dependency(clproto 6.0.0 REQUIRED)
+add_project_dependency(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
+add_project_dependency(clproto 7.0.0 REQUIRED)
 add_project_dependency(cppzmq 4.7.1 REQUIRED)
 
 include_directories(include)
