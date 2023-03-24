@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set (NETWORK_INTERFACES_VERSION 1.1.0)
+set (NETWORK_INTERFACES_VERSION 1.2.0)
 project(network_interfaces VERSION ${NETWORK_INTERFACES_VERSION})
 
 option(BUILD_TESTING "Build tests." OFF)
