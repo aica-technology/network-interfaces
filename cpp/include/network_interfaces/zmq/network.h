@@ -1,6 +1,6 @@
 #pragma once
 
-#include <clproto.h>
+#include <clproto.hpp>
 #include <state_representation/space/cartesian/CartesianState.hpp>
 #include <state_representation/space/joint/JointState.hpp>
 #include <state_representation/space/Jacobian.hpp>
