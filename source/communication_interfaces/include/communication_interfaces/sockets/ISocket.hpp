@@ -19,10 +19,10 @@ public:
   virtual ~ISocket() = default;
 
   /**
-   * @brief Perform configuration steps for socket communication
-   * @throws Exception if configuration fails (FIXME: specify exception)
+   * @brief Perform configuration steps to open the socket for communication
+   * @throws Exception if opening fails (FIXME: specify exception)
    */
-  virtual void configure() = 0;
+  virtual void open() = 0;
 
   /**
    * @brief Receive bytes from the socket
