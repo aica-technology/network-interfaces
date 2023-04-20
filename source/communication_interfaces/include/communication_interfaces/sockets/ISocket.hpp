@@ -20,6 +20,7 @@ public:
 
   /**
    * @brief Perform configuration steps for socket communication
+   * @throws Exception if configuration fails (FIXME: specify exception)
    */
   virtual void configure() = 0;
 

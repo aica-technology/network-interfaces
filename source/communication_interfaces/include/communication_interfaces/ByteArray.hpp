@@ -10,7 +10,7 @@ namespace communication_interfaces {
  * @brief The ByteArray wraps a dynamic array of bytes (i.e. char).
  * @details The ByteArray provides convenient methods for loading and unloading data types to and from the ByteArray.
  * The class actas as an interface definition to raw data (in case the underlying structure of the raw data changes).
- * It's intended use is for socket communication.
+ * Its intended use is for socket communication.
  * By default, data is appended/removed from the end of the array using the load/unload methods.
  */
 class ByteArray {
