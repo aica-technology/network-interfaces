@@ -20,7 +20,7 @@ To use this class, create a subclass that inherits from it and implement its pur
 functions are `open()`, `receive_bytes(ByteArray&)`, and `send_bytes(const ByteArray&)`.
 
 The `close()` function can optionally be overridden to perform steps to disconnect and close the socket communication.
-If a derived class defines any cleanup behavior in `close()`, it should also be invoked statically and explicilty
+If a derived class defines any cleanup behavior in `close()`, it should also be invoked statically and explicitly
 in the destructor of the derived class.
 
 An example is given below.
