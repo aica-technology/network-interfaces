@@ -16,11 +16,14 @@ public:
    */
   ISocket() = default;
 
+  /**
+   * @brief Default destructor
+   */
   virtual ~ISocket() = default;
 
   /**
    * @brief Perform configuration steps to open the socket for communication
-   * @throws Exception if opening fails (FIXME: specify exception)
+   * @throws SocketConfigurationException if opening fails
    */
   virtual void open() = 0;
 

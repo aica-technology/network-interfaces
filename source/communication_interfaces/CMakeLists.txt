@@ -34,6 +34,7 @@ include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/ByteArray.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq state_representation)
