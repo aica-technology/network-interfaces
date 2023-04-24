@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 
 project(communication_interfaces VERSION 0.0.1)
 
-# FIXME turn off
-option(BUILD_TESTING "Build tests." ON)
+option(BUILD_TESTING "Build tests." OFF)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -35,6 +34,8 @@ include_directories(include)
 add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/ByteArray.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/UDPServer.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq state_representation)

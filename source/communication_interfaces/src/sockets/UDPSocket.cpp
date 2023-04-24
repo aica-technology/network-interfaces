@@ -25,7 +25,7 @@ UDPSocket::UDPSocket() :
   this->parameters_.insert(std::make_pair("enable_reuse", this->enable_reuse_));
 }
 
-UDPSocket::UDPSocket(const std::list<std::shared_ptr<ParameterInterface>>& parameters) : UDPSocket() {
+UDPSocket::UDPSocket(const ParameterInterfaceList& parameters) : UDPSocket() {
   this->set_parameters(parameters);
 }
 
