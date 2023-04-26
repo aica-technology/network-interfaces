@@ -64,12 +64,7 @@ private:
    */
   void validate_and_set_parameter(const std::shared_ptr<state_representation::ParameterInterface>& parameter) override;
 
-  std::shared_ptr<state_representation::Parameter<std::string>> ip_address_; ///< IP address of the socket
-  std::shared_ptr<state_representation::Parameter<int>> port_; ///< Port of the socket
   std::shared_ptr<state_representation::Parameter<int>> buffer_size_; ///< Maximal size of buffer to receive
-  std::shared_ptr<state_representation::Parameter<double>>
-      timeout_duration_sec_; ///< Duration in seconds before receive or send times out
-  std::shared_ptr<state_representation::Parameter<bool>> enable_reuse_; ///< If true, enable the reuse of the IP/port
 
   int server_fd_; ///< File descriptor of the socket
   socklen_t addr_len_; ///< Length of the socket address

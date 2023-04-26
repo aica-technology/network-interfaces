@@ -19,7 +19,6 @@ public:
 
 TEST_F(TestUDPSockets, SendReceive) {
   const std::string send_string = "Hello world!";
-  params_.emplace_back(state_representation::make_shared_parameter<int>("buffer_size", 100));
 
   // Create server socket and bind it to a port
   sockets::UDPServer server(this->params_);

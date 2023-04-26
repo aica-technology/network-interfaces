@@ -10,19 +10,13 @@ namespace communication_interfaces::sockets {
 using namespace state_representation;
 
 UDPSocket::UDPSocket() :
-    server_address_(),
-    ip_address_(std::make_shared<Parameter<std::string>>("ip_address")),
-    port_(std::make_shared<Parameter<int>>("port")),
-    buffer_size_(std::make_shared<Parameter<int>>("buffer_size")),
-    timeout_duration_sec_(std::make_shared<Parameter<double>>("timeout_duration_sec", 0.0)),
-    enable_reuse_(std::make_shared<Parameter<bool>>("enable_reuse", false)),
-    server_fd_(),
-    addr_len_() {
-  this->parameters_.insert(std::make_pair("ip_address", this->ip_address_));
-  this->parameters_.insert(std::make_pair("port", this->port_));
+    server_address_(), buffer_size_(std::make_shared<Parameter<int>>("buffer_size")), server_fd_(), addr_len_() {
+  this->parameters_.insert_or_assign("ip_address", std::make_shared<Parameter<std::string>>("ip_address"));
+  this->parameters_.insert_or_assign("port", std::make_shared<Parameter<int>>("port"));
+  this->parameters_.insert_or_assign("enable_reuse", std::make_shared<Parameter<bool>>("enable_reuse", false));
+  this->parameters_.insert_or_assign(
+      "timeout_duration_sec", std::make_shared<Parameter<double>>("timeout_duration_sec", 0.0));
   this->parameters_.insert(std::make_pair("buffer_size", this->buffer_size_));
-  this->parameters_.insert(std::make_pair("timeout_duration_sec", this->timeout_duration_sec_));
-  this->parameters_.insert(std::make_pair("enable_reuse", this->enable_reuse_));
 }
 
 UDPSocket::UDPSocket(const ParameterInterfaceList& parameters) : UDPSocket() {
@@ -41,8 +35,8 @@ void UDPSocket::open_socket(bool bind_socket) {
   try {
     this->addr_len_ = sizeof(this->server_address_);
     this->server_address_.sin_family = AF_INET;
-    this->server_address_.sin_addr.s_addr = inet_addr(this->ip_address_->get_value().c_str());
-    this->server_address_.sin_port = htons(this->port_->get_value());
+    this->server_address_.sin_addr.s_addr = inet_addr(this->get_parameter_value<std::string>("ip_address").c_str());
+    this->server_address_.sin_port = htons(this->get_parameter_value<int>("port"));
   } catch (const std::exception& ex) {
     throw exceptions::SocketConfigurationException("Socket configuration failed: " + std::string(ex.what()));
   }
@@ -51,7 +45,7 @@ void UDPSocket::open_socket(bool bind_socket) {
   if (this->server_fd_ < 0) {
     throw exceptions::SocketConfigurationException("Opening socket failed");
   }
-  if (this->enable_reuse_ && this->enable_reuse_->get_value()) {
+  if (this->get_parameter_value<bool>("enable_reuse")) {
     const int opt_reuse = 1;
     if (setsockopt(this->server_fd_, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt_reuse, sizeof(opt_reuse)) != 0) {
       throw exceptions::SocketConfigurationException("Setting socket option (enable reuse) failed");
@@ -63,11 +57,12 @@ void UDPSocket::open_socket(bool bind_socket) {
     }
   }
 
-  if (this->timeout_duration_sec_->get_value() > 0.0) {
+  auto timeout_duration_sec = this->get_parameter_value<double>("timeout_duration_sec");
+  if (timeout_duration_sec > 0.0) {
     timeval timeout{};
-    auto secs = std::floor(this->timeout_duration_sec_->get_value());
+    auto secs = std::floor(timeout_duration_sec);
     timeout.tv_sec = static_cast<long>(secs);
-    timeout.tv_usec = static_cast<long>((this->timeout_duration_sec_->get_value() - secs) * 1e6);
+    timeout.tv_usec = static_cast<long>((timeout_duration_sec - secs) * 1e6);
     if (setsockopt(this->server_fd_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) != 0) {
       throw exceptions::SocketConfigurationException("Setting socket timeout failed.");
     }
@@ -97,7 +92,7 @@ bool UDPSocket::sendto(const sockaddr_in& address, const ByteArray& buffer) cons
 }
 
 void UDPSocket::validate_and_set_parameter(const std::shared_ptr<ParameterInterface>& parameter) {
-  // TODO can we put that in ParameterMap?
+  // TODO remove once this check is included in `assert_parameter_valid`
   if (this->parameters_.find(parameter->get_name()) == this->parameters_.end()) {
     throw state_representation::exceptions::InvalidParameterException(
         "Invalid parameter '" + parameter->get_name() + "' for class UDPSocket.");
@@ -111,19 +106,15 @@ void UDPSocket::validate_and_set_parameter(const std::shared_ptr<ParameterInterf
     throw state_representation::exceptions::InvalidParameterException(
         "Parameter 'timeout_duration_sec' cannot be negative.");
   }
-  // TODO can we put that in ParameterMap?
-  switch (parameter->get_parameter_type()) {
-    case ParameterType::STRING:
-      this->parameters_.at(parameter->get_name())->set_parameter_value(parameter->get_parameter_value<std::string>());
-      break;
-    case ParameterType::INT:
-      this->parameters_.at(parameter->get_name())->set_parameter_value(parameter->get_parameter_value<int>());
-      break;
-    case ParameterType::DOUBLE:
-      this->parameters_.at(parameter->get_name())->set_parameter_value(parameter->get_parameter_value<double>());
-      break;
-    default:
-      break;
+  if (parameter->get_name() == "buffer_size") {
+    int value = parameter->get_parameter_value<int>();
+    if (value < 0) {
+      throw state_representation::exceptions::InvalidParameterException(
+          "Parameter 'buffer_size' cannot be negative.");
+    }
+    this->parameters_.at(parameter->get_name())->set_parameter_value(value);
+  } else {
+    this->parameters_.insert_or_assign(parameter->get_name(), parameter);
   }
 }
 
