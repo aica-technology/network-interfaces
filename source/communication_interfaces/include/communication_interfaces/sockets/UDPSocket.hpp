@@ -41,15 +41,15 @@ protected:
 
   /**
    * @brief Receive bytes from the socket
-   * @param address The address from which to receive bytes
+   * @param address Reference to a sockaddr_in structure in which the sending address is to be stored
    * @param buffer The buffer to fill with the received bytes
    * @return True if bytes were received, false otherwise
    */
-  [[nodiscard]] bool recvfrom(const sockaddr_in& address, ByteArray& buffer);
+  [[nodiscard]] bool recvfrom(sockaddr_in& address, ByteArray& buffer);
 
   /**
    * @brief Send bytes to the socket
-   * @param address The address to send the bytes to
+   * @param address Reference to a sockaddr_in structure containing the destination address
    * @param buffer The buffer with the bytes to send
    * @return True if bytes were sent, false otherwise
    */

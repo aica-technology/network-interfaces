@@ -69,7 +69,7 @@ void UDPSocket::open_socket(bool bind_socket) {
   }
 }
 
-bool UDPSocket::recvfrom(const sockaddr_in& address, ByteArray& buffer) {
+bool UDPSocket::recvfrom(sockaddr_in& address, ByteArray& buffer) {
   std::vector<char> local_buffer(this->buffer_size_->get_value());
   auto receive_length = ::recvfrom(
       this->server_fd_, local_buffer.data(), this->buffer_size_->get_value(), 0, (sockaddr*) &(address),
