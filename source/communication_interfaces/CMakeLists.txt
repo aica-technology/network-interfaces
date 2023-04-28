@@ -36,6 +36,9 @@ add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPServer.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSocket.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisher.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSubscriber.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq state_representation)
