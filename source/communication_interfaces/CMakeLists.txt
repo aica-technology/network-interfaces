@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(communication_interfaces VERSION 0.0.1)
+set (COMMUNICATION_INTERFACES_VERSION 0.0.1)
+project(communication_interfaces VERSION ${COMMUNICATION_INTERFACES_VERSION})
 
 option(BUILD_TESTING "Build tests." OFF)
 
@@ -24,10 +25,22 @@ else()
     find_package(GTest QUIET)
 endif()
 
-include(GNUInstallDirs)
+macro(add_project_dependency)
+    find_package(${ARGV})
+    if(PKG_EXTERNAL_DEPS)
+        set(PKG_EXTERNAL_DEPS "${PKG_EXTERNAL_DEPS}, ${ARGV0} >= ${ARGV1}")
+    else()
+        set(PKG_EXTERNAL_DEPS "${ARGV0} >= ${ARGV1}")
+    endif()
+endmacro()
 
-find_package(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
-find_package(cppzmq 4.7.1 REQUIRED)
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+include(FindPkgConfig)
+
+add_project_dependency(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
+add_project_dependency(clproto 7.0.0 REQUIRED)
+add_project_dependency(cppzmq 4.7.1 REQUIRED)
 
 include_directories(include)
 
@@ -57,4 +70,36 @@ if(BUILD_TESTING)
     target_sources(test_${PROJECT_NAME} PRIVATE ${MODULE_TEST_SOURCES})
     target_link_libraries(test_${PROJECT_NAME} ${PROJECT_NAME} ${GTEST_LIBRARIES} pthread)
     add_test(NAME test_${PROJECT_NAME} COMMAND test_${PROJECT_NAME})
+endif()
+
+
+# generate the version file for the config file
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        VERSION "${PROJECT_VERSION}"
+        COMPATIBILITY SameMajorVersion
+)
+
+# create config file
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake.in
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+
+# install config files
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+        )
+
+if(${PKG_CONFIG_FOUND})
+    set(PKG_NAME ${PROJECT_NAME})
+    set(PKG_DESC "Communication Interfaces")
+    set(pkg_conf_file "${PROJECT_NAME}.pc")
+    configure_file("${pkg_conf_file}.in" "${CMAKE_BINARY_DIR}/${pkg_conf_file}" @ONLY)
+    install(FILES "${CMAKE_BINARY_DIR}/${pkg_conf_file}"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig/ COMPONENT pkgconfig)
+else()
+    message(WARNING "Could not find pkg-config executable, skipping generation of pkg-config files.")
 endif()

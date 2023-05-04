@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(state_representation)
+find_dependency(clproto)
+find_dependency(cppzmq)
