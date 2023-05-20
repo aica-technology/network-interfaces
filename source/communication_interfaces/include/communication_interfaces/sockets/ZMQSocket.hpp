@@ -7,6 +7,21 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @struct ZMQSocketConfiguration
+ * @brief Configuration parameters for a ZMQ socket
+ */
+struct ZMQSocketConfiguration {
+  ZMQSocketConfiguration(std::string ip_address, std::string port, bool bind_socket, bool wait = false) :
+      ip_address(std::move(ip_address)), port(std::move(port)), bind_socket(bind_socket), wait(wait) {}
+
+  std::string ip_address;
+  std::string port;
+  bool bind_socket;
+  bool wait;
+};
+
+/**
+ * @class ZMQSocket
  * @brief Abstract class to define a generic ZMQ socket
  */
 class ZMQSocket : public ISocket {
@@ -32,38 +47,24 @@ public:
   bool send_bytes(const ByteArray& buffer) override;
 
 protected:
-   /**
-    * @brief Add the parameters with no or default value to the map
-    * @param context The ZMQ context to be used for the sockets
-    * (it's recommended to only use one context per application)
-    */
-  explicit ZMQSocket(const std::shared_ptr<zmq::context_t>& context);
-
+    /**
+     * @brief Constructor taking the configuration struct
+     */
   /**
-   * @brief Add and set the parameters with the parameters given as argument
-   * @param parameters The list of parameters
+   * @brief Constructor taking the configuration struct
+   * @param The configuration struct
    * @param context The ZMQ context to be used for the sockets
-    * (it's recommended to only use one context per application)
+   * (it's recommended to only use one context per application)
    */
-  ZMQSocket(
-      const state_representation::ParameterInterfaceList& parameters, const std::shared_ptr<zmq::context_t>& context
-  );
+  ZMQSocket(ZMQSocketConfiguration configuration, const std::shared_ptr<zmq::context_t>& context);
 
   /**
    * @brief Bind or connect the socket on the desired IP/port
    */
   void open_socket();
 
+  ZMQSocketConfiguration config_; ///< Socket configuration struct
   std::shared_ptr<zmq::context_t> context_; ///< ZMQ context
   std::shared_ptr<zmq::socket_t> socket_; ///< ZMQ socket
-
-private:
-  /**
-   * @brief Validate and set parameters
-   * @param parameter A parameter interface pointer
-   */
-  void validate_and_set_parameter(const std::shared_ptr<state_representation::ParameterInterface>& parameter) final;
-
-  std::shared_ptr<state_representation::Parameter<bool>> wait_; ///< If false, send and receive are blocking
 };
 } // namespace communication_interfaces::sockets
