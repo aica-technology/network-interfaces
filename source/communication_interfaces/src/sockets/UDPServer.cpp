@@ -2,10 +2,7 @@
 
 namespace communication_interfaces::sockets {
 
-UDPServer::UDPServer() : UDPSocket(), client_address_() {}
-
-UDPServer::UDPServer(const std::list<std::shared_ptr<state_representation::ParameterInterface>>& parameters) :
-    UDPSocket(parameters), client_address_() {}
+UDPServer::UDPServer(UDPSocketConfiguration configuration) : UDPSocket(std::move(configuration)) {}
 
 void UDPServer::open() {
   this->open_socket(true);
