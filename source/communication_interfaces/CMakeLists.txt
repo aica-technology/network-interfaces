@@ -38,8 +38,6 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FindPkgConfig)
 
-add_project_dependency(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
-add_project_dependency(clproto 7.0.0 REQUIRED)
 add_project_dependency(cppzmq 4.7.1 REQUIRED)
 
 include_directories(include)
@@ -54,7 +52,7 @@ add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSubscriber.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq state_representation)
+target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
