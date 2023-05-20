@@ -1,7 +1,5 @@
 #pragma once
 
-#include <state_representation/parameters/ParameterMap.hpp>
-
 #include "communication_interfaces/ByteArray.hpp"
 
 namespace communication_interfaces::sockets {
@@ -9,7 +7,7 @@ namespace communication_interfaces::sockets {
 /**
  * @brief Interface class to define functions required for simple socket communication
  */
-class ISocket : public state_representation::ParameterMap {
+class ISocket {
 public:
   /**
    * @brief Default constructor
