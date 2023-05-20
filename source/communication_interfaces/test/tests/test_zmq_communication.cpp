@@ -10,24 +10,21 @@ using namespace std::chrono_literals;
 class TestZMQSockets : public ::testing::Test {
 public:
   TestZMQSockets() {
-      params_.emplace_back(state_representation::make_shared_parameter<std::string>("ip_address", "127.0.0.1"));
-      params_.emplace_back(state_representation::make_shared_parameter<std::string>("port", "5000"));
-      context_ = std::make_shared<zmq::context_t>(1);
-    }
+    ip_address_ = "127.0.0.1";
+    port_ = "5000";
+    context_ = std::make_shared<zmq::context_t>(1);
+  }
 
-    std::shared_ptr<zmq::context_t> context_;
-    state_representation::ParameterInterfaceList params_;
+  std::shared_ptr<zmq::context_t> context_;
+  std::string ip_address_;
+  std::string port_;
 };
 
 TEST_F(TestZMQSockets, SendReceive) {
   const std::string send_string = "Hello world!";
 
-  this->params_.emplace_back(state_representation::make_shared_parameter<bool>("bind_socket", true));
-  sockets::ZMQPublisher publisher(this->params_, this->context_);
-
-  this->params_.pop_back();
-  this->params_.emplace_back(state_representation::make_shared_parameter<bool>("bind_socket", false));
-  sockets::ZMQSubscriber subscriber(this->params_, this->context_);
+  sockets::ZMQPublisher publisher({this->ip_address_, this->port_, true}, this->context_);
+  sockets::ZMQSubscriber subscriber({this->ip_address_, this->port_, false}, this->context_);
 
   publisher.open();
   subscriber.open();
