@@ -11,19 +11,13 @@ namespace communication_interfaces::sockets {
  * @brief Configuration parameters for a UDP sockets
  */
 struct UDPSocketConfiguration {
-  UDPSocketConfiguration(
-      std::string ip_address, int port, int buffer_size, bool enable_reuse = false, double timeout_duration_sec = 0.0
-  ) :
-      ip_address(std::move(ip_address)),
-      port(port),
-      buffer_size(buffer_size),
-      enable_reuse(enable_reuse),
-      timeout_duration_sec(timeout_duration_sec) {}
+  UDPSocketConfiguration() = delete;
+
   std::string ip_address;
   int port;
   int buffer_size;
-  bool enable_reuse;
-  double timeout_duration_sec;
+  bool enable_reuse = false;
+  double timeout_duration_sec = 0.0;
 };
 
 /**
