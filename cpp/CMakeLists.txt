@@ -40,7 +40,9 @@ include(FindPkgConfig)
 
 add_project_dependency(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
 add_project_dependency(clproto 7.0.0 REQUIRED)
-add_project_dependency(cppzmq 4.7.1 REQUIRED)
+if (NOT ${cppzmq_FOUND}) # provided by parent CMakeLists.txt (if used)
+  add_project_dependency(cppzmq 4.7.1 REQUIRED)
+endif()
 
 include_directories(include)
 
