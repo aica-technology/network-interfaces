@@ -2,12 +2,11 @@ name: Build and Push Multi-Arch Images
 
 on:
   push:
-    # TODO: fix before merge
-    # branches:
-    #   - develop
-    #   - main
-    # tags:
-    #   - "v*.*.*"
+    branches:
+      - develop
+      - main
+    tags:
+      - "v*.*.*"
 
 jobs:
   get-tag:
@@ -37,9 +36,7 @@ jobs:
       - uses: aica-technology/.github/.github/actions/ghcr-build@v0.5.0
         with:
           image_name: aica-technology/network-interfaces
-          # TODO: fix before merge
-          # image_tags: ${{ needs.get-tag.outputs.tag }}-${{ matrix.arch }}
-          image_tags: v0.0.0-prototype-0000-${{ matrix.arch }}
+          image_tags: ${{ needs.get-tag.outputs.tag }}-${{ matrix.arch }}
           dockerfile_path: Dockerfile.ci
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -51,8 +48,6 @@ jobs:
       - uses: aica-technology/.github/.github/actions/ghcr-manifest-merge@v0.5.0
         with:
           image_name: aica-technology/network-interfaces
-          image_tags: v0.0.0-prototype-0000
-          # TODO: fix before merge
-          # image_tags: ${{ needs.get-tag.outputs.tag }}
+          image_tags: ${{ needs.get-tag.outputs.tag }}
           archs: amd64,arm64
           token: ${{ secrets.GITHUB_TOKEN }}
