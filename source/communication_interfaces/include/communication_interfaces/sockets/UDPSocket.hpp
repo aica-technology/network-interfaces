@@ -11,8 +11,6 @@ namespace communication_interfaces::sockets {
  * @brief Configuration parameters for a UDP sockets
  */
 struct UDPSocketConfiguration {
-  UDPSocketConfiguration() = delete;
-
   std::string ip_address;
   int port;
   int buffer_size;

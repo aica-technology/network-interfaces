@@ -10,21 +10,19 @@ using namespace std::chrono_literals;
 class TestZMQSockets : public ::testing::Test {
 public:
   TestZMQSockets() {
-    ip_address_ = "127.0.0.1";
-    port_ = "5000";
-    context_ = std::make_shared<zmq::context_t>(1);
+    auto context = std::make_shared<zmq::context_t>(1);
+    config_ = {context, "127.0.0.1", "4000"};
   }
 
-  std::shared_ptr<zmq::context_t> context_;
-  std::string ip_address_;
-  std::string port_;
+  sockets::ZMQSocketConfiguration config_;
 };
 
 TEST_F(TestZMQSockets, SendReceive) {
   const std::string send_string = "Hello world!";
 
-  sockets::ZMQPublisher publisher({this->ip_address_, this->port_, true}, this->context_);
-  sockets::ZMQSubscriber subscriber({this->ip_address_, this->port_, false}, this->context_);
+  sockets::ZMQPublisher publisher(this->config_);
+  this->config_.bind = false;
+  sockets::ZMQSubscriber subscriber(this->config_);
 
   publisher.open();
   subscriber.open();

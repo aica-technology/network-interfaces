@@ -9,10 +9,10 @@ using namespace communication_interfaces;
 class TestUDPSockets : public ::testing::Test {
 public:
   TestUDPSockets() {
-    config_ = {.ip_address = "127.0.0.1", .port = 5000, .buffer_size = 100};
+    config_ = {"127.0.0.1", 5000, 100};
   }
 
-  sockets::UDPSocketConfiguration config_{};
+  sockets::UDPSocketConfiguration config_;
 };
 
 TEST_F(TestUDPSockets, SendReceive) {

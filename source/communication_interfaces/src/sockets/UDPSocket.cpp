@@ -20,9 +20,6 @@ UDPSocket::~UDPSocket() {
 }
 
 void UDPSocket::open_socket(bool bind_socket) {
-  if (this->config_.buffer_size <= 0) {
-    throw exceptions::SocketConfigurationException("Socket configuration failed: 'buffer_size' must be greter than 0");
-  }
   try {
     this->addr_len_ = sizeof(this->server_address_);
     this->server_address_.sin_family = AF_INET;
