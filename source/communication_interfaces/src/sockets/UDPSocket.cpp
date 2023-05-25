@@ -65,13 +65,13 @@ bool UDPSocket::recvfrom(sockaddr_in& address, std::string& buffer) {
   if (receive_length < 0) {
     return false;
   }
-  buffer.assign(&(local_buffer[0]), local_buffer.size());
+  buffer.assign(local_buffer.data(), local_buffer.size());
   return true;
 }
 
 bool UDPSocket::sendto(const sockaddr_in& address, const std::string& buffer) const {
   int send_length = ::sendto(
-      this->server_fd_, buffer.data(), buffer.length(), 0, (sockaddr*) &(address), this->addr_len_);
+      this->server_fd_, buffer.data(), buffer.size(), 0, (sockaddr*) &(address), this->addr_len_);
   return send_length == static_cast<int>(buffer.size());
 }
 

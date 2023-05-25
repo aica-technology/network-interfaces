@@ -40,13 +40,13 @@ bool ZMQSocket::receive_bytes(std::string& buffer) {
 bool ZMQSocket::send_bytes(const std::string& buffer) {
   zmq::send_flags send_flags = this->config_.wait ? zmq::send_flags::none : zmq::send_flags::dontwait;
   zmq::message_t msg(buffer.size());
-  memcpy(msg.data(), buffer.c_str(), buffer.length());
+  memcpy(msg.data(), buffer.data(), buffer.size());
   try {
     auto sent = this->socket_->send(msg, send_flags);
     if (!sent.has_value()) {
       return false;
     }
-    return *sent == buffer.length();
+    return *sent == buffer.size();
   } catch (const zmq::error_t&) {
     return false;
   }
