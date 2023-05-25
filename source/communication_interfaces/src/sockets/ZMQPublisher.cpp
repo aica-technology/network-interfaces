@@ -9,7 +9,7 @@ void ZMQPublisher::open() {
   this->open_socket();
 }
 
-bool ZMQPublisher::receive_bytes(ByteArray&) {
+bool ZMQPublisher::receive_bytes(std::string&) {
   throw std::runtime_error("Receive not available for socket of type ZMQPublisher");
 }
 } // namespace communication_interfaces::sockets

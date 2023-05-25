@@ -1,8 +1,9 @@
 #include "communication_interfaces/sockets/UDPSocket.hpp"
 
 #include <cmath>
-#include <unistd.h>
 #include <sys/socket.h>
+#include <vector>
+#include <unistd.h>
 
 #include "communication_interfaces/exceptions/SocketConfigurationException.hpp"
 
@@ -57,25 +58,21 @@ void UDPSocket::open_socket(bool bind_socket) {
   }
 }
 
-bool UDPSocket::recvfrom(sockaddr_in& address, ByteArray& buffer) {
+bool UDPSocket::recvfrom(sockaddr_in& address, std::string& buffer) {
   std::vector<char> local_buffer(this->config_.buffer_size);
   auto receive_length = ::recvfrom(
       this->server_fd_, local_buffer.data(), this->config_.buffer_size, 0, (sockaddr*) &(address), &(this->addr_len_));
   if (receive_length < 0) {
     return false;
   }
-  local_buffer.at(receive_length) = 0;
-  buffer.reset();
-  buffer.load(local_buffer.data(), receive_length);
+  buffer.assign(&(local_buffer[0]), local_buffer.size());
   return true;
 }
 
-bool UDPSocket::sendto(const sockaddr_in& address, const ByteArray& buffer) const {
-  std::vector<char> local_buffer;
-  buffer.copy_to(local_buffer);
+bool UDPSocket::sendto(const sockaddr_in& address, const std::string& buffer) const {
   int send_length = ::sendto(
-      this->server_fd_, local_buffer.data(), local_buffer.size(), 0, (sockaddr*) &(address), this->addr_len_);
-  return send_length == static_cast<int>(local_buffer.size());
+      this->server_fd_, buffer.data(), buffer.length(), 0, (sockaddr*) &(address), this->addr_len_);
+  return send_length == static_cast<int>(buffer.size());
 }
 
 void UDPSocket::close() {

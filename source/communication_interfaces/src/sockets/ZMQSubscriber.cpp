@@ -11,7 +11,7 @@ void ZMQSubscriber::open() {
   this->socket_->set(zmq::sockopt::subscribe, "");
 }
 
-bool ZMQSubscriber::send_bytes(const ByteArray&) {
+bool ZMQSubscriber::send_bytes(const std::string&) {
   throw std::runtime_error("Send not available for socket of type ZMQSubscriber");
 }
 } // namespace communication_interfaces::sockets

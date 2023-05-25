@@ -23,6 +23,6 @@ public:
   /**
    * @brief This method throws a runtime error as sending is not available for a ZMQ publisher
    */
-  bool send_bytes(const ByteArray& buffer) override;
+  bool send_bytes(const std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

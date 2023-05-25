@@ -21,13 +21,13 @@ public:
   void open() override;
 
   /**
-   * @copydoc ISocket::receive_bytes(ByteArray&)
+   * @copydoc ISocket::receive_bytes(std::string&)
    */
-  bool receive_bytes(ByteArray& buffer) override;
+  bool receive_bytes(std::string& buffer) override;
 
   /**
-   * @copydoc ISocket::send_bytes(const ByteArray&)
+   * @copydoc ISocket::send_bytes(const std::string&)
    */
-  bool send_bytes(const ByteArray& buffer) override;
+  bool send_bytes(const std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

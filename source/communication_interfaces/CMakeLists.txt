@@ -43,7 +43,6 @@ add_project_dependency(cppzmq 4.7.1 REQUIRED)
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
-        ${PROJECT_SOURCE_DIR}/src/ByteArray.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPServer.cpp

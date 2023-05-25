@@ -19,6 +19,7 @@ public:
 
 TEST_F(TestZMQSockets, SendReceive) {
   const std::string send_string = "Hello world!";
+  std::string receive_string;
 
   sockets::ZMQPublisher publisher(this->config_);
   this->config_.bind = false;
@@ -27,17 +28,12 @@ TEST_F(TestZMQSockets, SendReceive) {
   publisher.open();
   subscriber.open();
 
-  ByteArray message;
-  message.copy_from(send_string);
   for (int i = 0; i < 5; ++i) {
-    EXPECT_TRUE(publisher.send_bytes(message));
+    EXPECT_TRUE(publisher.send_bytes(send_string));
     usleep(10000);
   }
-  message.reset();
-  ASSERT_TRUE(subscriber.receive_bytes(message));
-  std::string received_string;
-  message.copy_to(received_string);
-  EXPECT_STREQ(received_string.c_str(), send_string.c_str());
+  ASSERT_TRUE(subscriber.receive_bytes(receive_string));
+  EXPECT_STREQ(receive_string.c_str(), send_string.c_str());
   publisher.close();
   subscriber.close();
 }

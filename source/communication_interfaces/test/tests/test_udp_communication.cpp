@@ -17,6 +17,7 @@ public:
 
 TEST_F(TestUDPSockets, SendReceive) {
   const std::string send_string = "Hello world!";
+  std::string receive_string;
 
   // Create server socket and bind it to a port
   sockets::UDPServer server(this->config_);
@@ -27,18 +28,13 @@ TEST_F(TestUDPSockets, SendReceive) {
   ASSERT_NO_THROW(client.open());
 
   // Send test message from client to server
-  ByteArray message;
-  message.copy_from(send_string);
-  ASSERT_TRUE(client.send_bytes(message));
+  ASSERT_TRUE(client.send_bytes(send_string));
 
   // Receive message on server
-  message.reset();
-  ASSERT_TRUE(server.receive_bytes(message));
+  ASSERT_TRUE(server.receive_bytes(receive_string));
 
   // Convert received message to string and compare with sent message
-  std::string received_string;
-  message.copy_to(received_string);
-  EXPECT_STREQ(received_string.c_str(), send_string.c_str());
+  EXPECT_STREQ(receive_string.c_str(), send_string.c_str());
 }
 
 TEST_F(TestUDPSockets, Timeout) {
@@ -47,7 +43,7 @@ TEST_F(TestUDPSockets, Timeout) {
   sockets::UDPServer server(this->config_);
 
   // Try to receive a message from client, but expect timeout
-  ByteArray received_bytes;
+  std::string received_bytes;
   EXPECT_FALSE(server.receive_bytes(received_bytes));
 }
 
@@ -74,5 +70,5 @@ TEST_F(TestUDPSockets, OpenClose) {
   client.open();
 
   // Try to send a message from the closed server socket (expect failure)
-  EXPECT_FALSE(server.send_bytes(ByteArray()));
+  EXPECT_FALSE(server.send_bytes(std::string()));
 }
