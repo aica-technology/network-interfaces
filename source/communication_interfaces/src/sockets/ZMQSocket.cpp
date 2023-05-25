@@ -23,14 +23,13 @@ void ZMQSocket::open_socket() {
   }
 }
 
-bool ZMQSocket::receive_bytes(ByteArray& buffer) {
+bool ZMQSocket::receive_bytes(std::string& buffer) {
   zmq::recv_flags recv_flag = this->config_.wait ? zmq::recv_flags::none : zmq::recv_flags::dontwait;
   zmq::message_t message;
   try {
     auto received = this->socket_->recv(message, recv_flag);
     if (received.has_value()) {
-      buffer.reset();
-      buffer.load(message.data(), message.size());
+      buffer = std::string(static_cast<char*>(message.data()), message.size());
     }
     return received.has_value();
   } catch (const zmq::error_t&) {
@@ -38,14 +37,16 @@ bool ZMQSocket::receive_bytes(ByteArray& buffer) {
   }
 }
 
-bool ZMQSocket::send_bytes(const ByteArray& buffer) {
+bool ZMQSocket::send_bytes(const std::string& buffer) {
   zmq::send_flags send_flags = this->config_.wait ? zmq::send_flags::none : zmq::send_flags::dontwait;
-  std::vector<char> local_buffer;
-  buffer.copy_to(local_buffer);
-  zmq::message_t msg(local_buffer.begin(), local_buffer.end());
+  zmq::message_t msg(buffer.size());
+  memcpy(msg.data(), buffer.data(), buffer.size());
   try {
     auto sent = this->socket_->send(msg, send_flags);
-    return sent.has_value();
+    if (!sent.has_value()) {
+      return false;
+    }
+    return *sent == buffer.size();
   } catch (const zmq::error_t&) {
     return false;
   }

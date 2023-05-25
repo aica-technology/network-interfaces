@@ -23,6 +23,6 @@ public:
   /**
    * @brief This method throws a runtime error as receiving is not available for a ZMQ publisher
    */
-  bool receive_bytes(ByteArray& buffer) override;
+  bool receive_bytes(std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

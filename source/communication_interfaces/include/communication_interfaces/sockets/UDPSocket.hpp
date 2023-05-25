@@ -53,7 +53,7 @@ protected:
    * @param buffer The buffer to fill with the received bytes
    * @return True if bytes were received, false otherwise
    */
-  [[nodiscard]] bool recvfrom(sockaddr_in& address, ByteArray& buffer);
+  [[nodiscard]] bool recvfrom(sockaddr_in& address, std::string& buffer);
 
   /**
    * @brief Send bytes to the socket
@@ -61,7 +61,7 @@ protected:
    * @param buffer The buffer with the bytes to send
    * @return True if bytes were sent, false otherwise
    */
-  [[nodiscard]] bool sendto(const sockaddr_in& address, const ByteArray& buffer) const;
+  [[nodiscard]] bool sendto(const sockaddr_in& address, const std::string& buffer) const;
 
   sockaddr_in server_address_; ///< Address of the UDP server
 
