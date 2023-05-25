@@ -11,9 +11,9 @@ namespace communication_interfaces::sockets {
 class ZMQPublisher : public ZMQSocket {
 public:
   /**
-   * @copydoc ZMQSocket::ZMQSocket(ZMQSocketConfiguration, const std::shared_ptr<zmq::context_t>&)
+   * @copydoc ZMQSocket::ZMQSocket(ZMQSocketConfiguration)
    */
-  explicit ZMQPublisher(ZMQSocketConfiguration configuration, const std::shared_ptr<zmq::context_t>& context);
+  explicit ZMQPublisher(ZMQSocketConfiguration configuration);
 
   /**
    * @copydoc ISocket::open()

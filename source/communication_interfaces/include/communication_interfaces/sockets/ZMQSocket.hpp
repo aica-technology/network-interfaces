@@ -11,13 +11,11 @@ namespace communication_interfaces::sockets {
  * @brief Configuration parameters for a ZMQ socket
  */
 struct ZMQSocketConfiguration {
-  ZMQSocketConfiguration(std::string ip_address, std::string port, bool bind_socket, bool wait = false) :
-      ip_address(std::move(ip_address)), port(std::move(port)), bind_socket(bind_socket), wait(wait) {}
-
+  std::shared_ptr<zmq::context_t> context;
   std::string ip_address;
   std::string port;
-  bool bind_socket;
-  bool wait;
+  bool bind = true;
+  bool wait = true;
 };
 
 /**
@@ -47,16 +45,11 @@ public:
   bool send_bytes(const ByteArray& buffer) override;
 
 protected:
-    /**
-     * @brief Constructor taking the configuration struct
-     */
   /**
    * @brief Constructor taking the configuration struct
    * @param The configuration struct
-   * @param context The ZMQ context to be used for the sockets
-   * (it's recommended to only use one context per application)
    */
-  ZMQSocket(ZMQSocketConfiguration configuration, const std::shared_ptr<zmq::context_t>& context);
+  ZMQSocket(ZMQSocketConfiguration configuration);
 
   /**
    * @brief Bind or connect the socket on the desired IP/port
@@ -64,7 +57,6 @@ protected:
   void open_socket();
 
   ZMQSocketConfiguration config_; ///< Socket configuration struct
-  std::shared_ptr<zmq::context_t> context_; ///< ZMQ context
   std::shared_ptr<zmq::socket_t> socket_; ///< ZMQ socket
 };
 } // namespace communication_interfaces::sockets

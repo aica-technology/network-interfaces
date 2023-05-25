@@ -4,8 +4,7 @@
 
 namespace communication_interfaces::sockets {
 
-ZMQSocket::ZMQSocket(ZMQSocketConfiguration configuration, const std::shared_ptr<zmq::context_t>& context) :
-    config_(std::move(configuration)), context_(context) {}
+ZMQSocket::ZMQSocket(ZMQSocketConfiguration configuration) : config_(std::move(configuration)) {}
 
 ZMQSocket::~ZMQSocket() {
   ZMQSocket::close();
@@ -14,7 +13,7 @@ ZMQSocket::~ZMQSocket() {
 void ZMQSocket::open_socket() {
   try {
     auto address = "tcp://" + this->config_.ip_address + ":" + this->config_.port;
-    if (this->config_.bind_socket) {
+    if (this->config_.bind) {
       this->socket_->bind(address);
     } else {
       this->socket_->connect(address);

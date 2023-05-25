@@ -2,11 +2,10 @@
 
 namespace communication_interfaces::sockets {
 
-ZMQPublisher::ZMQPublisher(ZMQSocketConfiguration configuration, const std::shared_ptr<zmq::context_t>& context) :
-    ZMQSocket(std::move(configuration), context) {}
+ZMQPublisher::ZMQPublisher(ZMQSocketConfiguration configuration) : ZMQSocket(std::move(configuration)) {}
 
 void ZMQPublisher::open() {
-  this->socket_ = std::make_shared<zmq::socket_t>(*this->context_, ZMQ_PUB);
+  this->socket_ = std::make_shared<zmq::socket_t>(*this->config_.context, ZMQ_PUB);
   this->open_socket();
 }
 
