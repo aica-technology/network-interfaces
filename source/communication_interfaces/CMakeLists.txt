@@ -50,7 +50,9 @@ add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisher.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSubscriber.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisherSubscriber.cpp
-        )
+        ${PROJECT_SOURCE_DIR}/src/sockets/TCPSocket.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/TCPClient.cpp
+        ${PROJECT_SOURCE_DIR}/src/sockets/TCPServer.cpp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq)
 
