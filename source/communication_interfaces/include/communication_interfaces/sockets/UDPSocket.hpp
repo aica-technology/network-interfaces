@@ -7,6 +7,19 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @struct UDPSocketConfiguration
+ * @brief Configuration parameters for a UDP sockets
+ */
+struct UDPSocketConfiguration {
+  std::string ip_address;
+  int port;
+  int buffer_size;
+  bool enable_reuse = false;
+  double timeout_duration_sec = 0.0;
+};
+
+/**
+ * @class UDPSocket
  * @brief Abstract class to define a generic UDP socket
  */
 class UDPSocket : public ISocket {
@@ -23,15 +36,10 @@ public:
 
 protected:
   /**
-   * @brief Add the parameters with no or default value to the map
+   * @brief Constructor taking the configuration struct
+   * @param The configuration struct
    */
-  UDPSocket();
-
-  /**
-   * @brief Add and set the parameters with the parameters given as argument
-   * @param parameters The list of parameters
-   */
-  explicit UDPSocket(const state_representation::ParameterInterfaceList& parameters);
+  explicit UDPSocket(UDPSocketConfiguration configuration);
 
   /**
    * @brief Perform steps to open the socket on the desired IP/port, set reuse and timeout options and bind if desired.
@@ -58,14 +66,7 @@ protected:
   sockaddr_in server_address_; ///< Address of the UDP server
 
 private:
-  /**
-   * @brief Validate and set parameters
-   * @param parameter A parameter interface pointer
-   */
-  void validate_and_set_parameter(const std::shared_ptr<state_representation::ParameterInterface>& parameter) override;
-
-  std::shared_ptr<state_representation::Parameter<int>> buffer_size_; ///< Maximal size of buffer to receive
-
+  UDPSocketConfiguration config_; ///< Socket configuration struct
   int server_fd_; ///< File descriptor of the socket
   socklen_t addr_len_; ///< Length of the socket address
 };

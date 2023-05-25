@@ -71,20 +71,6 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-$(pkg-config --exists state_representation) || exit 1
-if [ "$?" == 1 ]; then
-  echo ">>> STATE REPRESENTATION LIBRARY NOT FOUND!"
-  echo ">>> Install state_representation from https://github.com/aica-technology/control-libraries/source"
-  exit 1
-fi
-
-$(pkg-config --exists clproto) || exit 1
-if [ "$?" == 1 ]; then
-  echo ">>> CL PROTO LIBRARY NOT FOUND!"
-  echo ">>> Install clproto from https://github.com/aica-technology/control-libraries/protocol"
-  exit 1
-fi
-
 echo ">>> INSTALLING ZMQ DEPENDENCIES"
 install_cppzmq || exit 1
 

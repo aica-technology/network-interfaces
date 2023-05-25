@@ -12,10 +12,4 @@ RUN tar -xzf cppzmq-${CPPZMQ_VERSION}.tar.gz
 WORKDIR /tmp/cppzmq-${CPPZMQ_VERSION}
 RUN mkdir build && cd build && cmake .. -DCPPZMQ_BUILD_TESTS=OFF && make -j install
 
-
-WORKDIR /tmp
-ARG CONTROL_LIBRARIES_BRANCH=v7.0.0
-RUN git clone -b ${CONTROL_LIBRARIES_BRANCH} --depth 1 https://github.com/aica-technology/control-libraries.git
-RUN cd control-libraries/source && ./install.sh --auto --no-controllers --no-dynamical-systems --no-robot-model
-
 RUN rm -rf /tmp/*

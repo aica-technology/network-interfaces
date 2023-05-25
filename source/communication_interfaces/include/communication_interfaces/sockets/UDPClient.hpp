@@ -5,19 +5,15 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @class UDPClient
  * @brief Class to define a UDP client
  */
 class UDPClient : public UDPSocket {
 public:
   /**
-   * @copydoc UDPSocket::UDPSocket()
+   * @copydoc UDPSocket::UDPSocket(UDPSocketConfiguration)
    */
-  UDPClient();
-
-  /**
-   * @copydoc UDPSocket::UDPSocket(const state_representation::ParameterInterfaceList&)
-   */
-  explicit UDPClient(const state_representation::ParameterInterfaceList& parameters);
+  UDPClient(UDPSocketConfiguration configuration);
 
   /**
    * @copydoc ISocket::open()

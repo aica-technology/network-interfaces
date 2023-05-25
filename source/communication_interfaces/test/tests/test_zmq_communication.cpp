@@ -10,24 +10,19 @@ using namespace std::chrono_literals;
 class TestZMQSockets : public ::testing::Test {
 public:
   TestZMQSockets() {
-      params_.emplace_back(state_representation::make_shared_parameter<std::string>("ip_address", "127.0.0.1"));
-      params_.emplace_back(state_representation::make_shared_parameter<std::string>("port", "5000"));
-      context_ = std::make_shared<zmq::context_t>(1);
-    }
+    auto context = std::make_shared<zmq::context_t>(1);
+    config_ = {context, "127.0.0.1", "4000"};
+  }
 
-    std::shared_ptr<zmq::context_t> context_;
-    state_representation::ParameterInterfaceList params_;
+  sockets::ZMQSocketConfiguration config_;
 };
 
 TEST_F(TestZMQSockets, SendReceive) {
   const std::string send_string = "Hello world!";
 
-  this->params_.emplace_back(state_representation::make_shared_parameter<bool>("bind_socket", true));
-  sockets::ZMQPublisher publisher(this->params_, this->context_);
-
-  this->params_.pop_back();
-  this->params_.emplace_back(state_representation::make_shared_parameter<bool>("bind_socket", false));
-  sockets::ZMQSubscriber subscriber(this->params_, this->context_);
+  sockets::ZMQPublisher publisher(this->config_);
+  this->config_.bind = false;
+  sockets::ZMQSubscriber subscriber(this->config_);
 
   publisher.open();
   subscriber.open();

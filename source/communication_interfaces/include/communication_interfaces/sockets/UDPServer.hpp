@@ -5,19 +5,15 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @class UDPServer
  * @brief Class to define a UDP server
  */
 class UDPServer : public UDPSocket {
 public:
   /**
-   * @copydoc UDPSocket::UDPSocket()
+   * @copydoc UDPSocket::UDPSocket(UDPSocketConfiguration)
    */
-  UDPServer();
-
-  /**
-   * @copydoc UDPSocket::UDPSocket(const state_representation::ParameterInterfaceList&)
-   */
-  explicit UDPServer(const std::list<std::shared_ptr<state_representation::ParameterInterface>>& parameters);
+  UDPServer(UDPSocketConfiguration configuration);
 
   /**
    * @copydoc ISocket::open()
