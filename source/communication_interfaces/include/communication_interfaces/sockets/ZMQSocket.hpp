@@ -15,7 +15,7 @@ struct ZMQSocketConfiguration {
   std::string ip_address;
   std::string port;
   bool bind = true;
-  bool wait = true;
+  bool wait = false;
 };
 
 /**

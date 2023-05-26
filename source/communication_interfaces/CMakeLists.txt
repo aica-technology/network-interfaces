@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set (COMMUNICATION_INTERFACES_VERSION 0.0.1)
+set(COMMUNICATION_INTERFACES_VERSION 0.0.1)
 project(communication_interfaces VERSION ${COMMUNICATION_INTERFACES_VERSION})
 
 option(BUILD_TESTING "Build tests." OFF)
@@ -49,7 +49,8 @@ add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisher.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSubscriber.cpp
-)
+        ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisherSubscriber.cpp
+        )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq)
 
