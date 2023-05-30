@@ -5,9 +5,12 @@ on:
   workflow_dispatch:
     inputs:
       cl_branch:
-        description: 'If set, the desired branch of control libraries'
+        description: "If set, the desired branch of control libraries"
         required: false
-        default: 'develop'
+        default: "develop"
+      tag:
+        description: "The tag to use"
+        required: true
 
 jobs:
   build-publish:
@@ -19,7 +22,7 @@ jobs:
 
       - name: Build image
         run: |
-          IMAGE_NAME=network-interfaces:latest
+          IMAGE_NAME=network-interfaces:${{ inputs.tag }}
           docker build . \
             --build-arg CONTROL_LIBRARIES_BRANCH=${{ inputs.cl_branch }} \
             --tag ${IMAGE_NAME}
@@ -31,7 +34,7 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_NAME=network-interfaces:latest
+          IMAGE_NAME=network-interfaces:${{ inputs.tag }}
           docker tag ${IMAGE_NAME} ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}
           docker push ghcr.io/${{ github.repository_owner }}/${IMAGE_NAME}
         shell: bash
