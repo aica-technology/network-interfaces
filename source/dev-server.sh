@@ -1,5 +1,4 @@
 #!/bin/bash
-CONTROL_LIBRARIES_BRANCH=develop
 REMOTE_SSH_PORT=4420
 
 IMAGE_NAME=aica-technology/communication-interfaces

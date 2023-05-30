@@ -5,19 +5,15 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @class UDPClient
  * @brief Class to define a UDP client
  */
 class UDPClient : public UDPSocket {
 public:
   /**
-   * @copydoc UDPSocket::UDPSocket()
+   * @copydoc UDPSocket::UDPSocket(UDPSocketConfiguration)
    */
-  UDPClient();
-
-  /**
-   * @copydoc UDPSocket::UDPSocket(const state_representation::ParameterInterfaceList&)
-   */
-  explicit UDPClient(const state_representation::ParameterInterfaceList& parameters);
+  UDPClient(UDPSocketConfiguration configuration);
 
   /**
    * @copydoc ISocket::open()
@@ -25,13 +21,13 @@ public:
   void open() override;
 
   /**
-   * @copydoc ISocket::receive_bytes(ByteArray&)
+   * @copydoc ISocket::receive_bytes(std::string&)
    */
-  bool receive_bytes(ByteArray& buffer) override;
+  bool receive_bytes(std::string& buffer) override;
 
   /**
-   * @copydoc ISocket::send_bytes(const ByteArray&)
+   * @copydoc ISocket::send_bytes(const std::string&)
    */
-  bool send_bytes(const ByteArray& buffer) override;
+  bool send_bytes(const std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

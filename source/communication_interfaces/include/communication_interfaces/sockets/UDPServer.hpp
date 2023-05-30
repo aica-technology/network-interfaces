@@ -5,19 +5,15 @@
 namespace communication_interfaces::sockets {
 
 /**
+ * @class UDPServer
  * @brief Class to define a UDP server
  */
 class UDPServer : public UDPSocket {
 public:
   /**
-   * @copydoc UDPSocket::UDPSocket()
+   * @copydoc UDPSocket::UDPSocket(UDPSocketConfiguration)
    */
-  UDPServer();
-
-  /**
-   * @copydoc UDPSocket::UDPSocket(const state_representation::ParameterInterfaceList&)
-   */
-  explicit UDPServer(const std::list<std::shared_ptr<state_representation::ParameterInterface>>& parameters);
+  UDPServer(UDPSocketConfiguration configuration);
 
   /**
    * @copydoc ISocket::open()
@@ -25,14 +21,14 @@ public:
   void open() override;
 
   /**
-   * @copydoc ISocket::receive_bytes(ByteArray&)
+   * @copydoc ISocket::receive_bytes(std::string&)
    */
-  bool receive_bytes(ByteArray& buffer) override;
+  bool receive_bytes(std::string& buffer) override;
 
   /**
-   * @copydoc ISocket::send_bytes(const ByteArray&)
+   * @copydoc ISocket::send_bytes(const std::string&)
    */
-  bool send_bytes(const ByteArray& buffer) override;
+  bool send_bytes(const std::string& buffer) override;
 
 private:
   sockaddr_in client_address_;

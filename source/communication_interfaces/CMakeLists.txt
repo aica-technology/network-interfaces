@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set (COMMUNICATION_INTERFACES_VERSION 0.0.1)
+set(COMMUNICATION_INTERFACES_VERSION 0.0.1)
 project(communication_interfaces VERSION ${COMMUNICATION_INTERFACES_VERSION})
 
 option(BUILD_TESTING "Build tests." OFF)
@@ -38,8 +38,6 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FindPkgConfig)
 
-add_project_dependency(control_libraries 7.0.0 REQUIRED COMPONENTS state_representation)
-add_project_dependency(clproto 7.0.0 REQUIRED)
 if (NOT ${cppzmq_FOUND}) # provided by parent CMakeLists.txt (if used)
   add_project_dependency(cppzmq 4.7.1 REQUIRED)
 endif()
@@ -47,16 +45,16 @@ endif()
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
-        ${PROJECT_SOURCE_DIR}/src/ByteArray.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPServer.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisher.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/ZMQSubscriber.cpp
-)
+        ${PROJECT_SOURCE_DIR}/src/sockets/ZMQPublisherSubscriber.cpp
+        )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq state_representation)
+target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 

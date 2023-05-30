@@ -1,15 +1,13 @@
 #pragma once
 
-#include <state_representation/parameters/ParameterMap.hpp>
-
-#include "communication_interfaces/ByteArray.hpp"
+#include <string>
 
 namespace communication_interfaces::sockets {
 
 /**
  * @brief Interface class to define functions required for simple socket communication
  */
-class ISocket : public state_representation::ParameterMap {
+class ISocket {
 public:
   /**
    * @brief Default constructor
@@ -32,14 +30,14 @@ public:
    * @param buffer The buffer to fill with the received bytes
    * @return True if bytes were received, false otherwise
    */
-  virtual bool receive_bytes(ByteArray& buffer) = 0;
+  virtual bool receive_bytes(std::string& buffer) = 0;
 
   /**
    * @brief Send bytes to the socket
    * @param buffer The buffer with the bytes to send
    * @return True if bytes were sent, false otherwise
    */
-  virtual bool send_bytes(const ByteArray& buffer) = 0;
+  virtual bool send_bytes(const std::string& buffer) = 0;
 
   /**
    * @brief Perform steps to disconnect and close the socket communication
