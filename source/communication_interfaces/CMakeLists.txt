@@ -38,7 +38,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FindPkgConfig)
 
-if (NOT ${cppzmq_FOUND}) # provided by parent CMakeLists.txt (if used)
+if (NOT cppzmq_POPULATED) # provided by parent CMakeLists.txt (if used)
   add_project_dependency(cppzmq 4.7.1 REQUIRED)
 endif()
 
