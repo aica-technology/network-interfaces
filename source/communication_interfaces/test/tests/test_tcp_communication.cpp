@@ -19,8 +19,6 @@ public:
 
   void serve() const {
     server_->open();
-    server_->connect();
-    ASSERT_TRUE(server_->is_connected());
     std::string recv_message;
     EXPECT_TRUE(server_->receive_bytes(recv_message));
     EXPECT_STREQ(recv_message.c_str(), client_message_.c_str());
@@ -33,8 +31,6 @@ public:
 
   void client() const {
     client_->open();
-    client_->connect();
-    ASSERT_TRUE(client_->is_connected());
     EXPECT_TRUE(client_->send_bytes(client_message_));
     std::string recv_message;
     EXPECT_TRUE(client_->receive_bytes(recv_message));

@@ -19,18 +19,6 @@ public:
   ~TCPSocket() override;
 
   /**
-   * @brief Connect the TCP socket to its counterpart (client / server)
-   * @details This method should be called after `open()` and may be blocking (for the case of a server)
-   */
-  virtual void connect() = 0;
-
-  /**
-   * @brief Getter of the connected attribute
-   * @return True if socket is connected
-   */
-  [[nodiscard]] bool is_connected() const;
-
-  /**
    * @copydoc ISocket::receive_bytes(std::string&)
    */
   bool receive_bytes(std::string& buffer) override;
@@ -50,7 +38,6 @@ protected:
 
   sockaddr_in server_address_; ///< Address of the TCP server
   int socket_fd_; ///< File descriptor of the socket
-  bool connected_; ///< Bool to indicate connection status
   int buffer_size_; ///< Buffer size
 };
 } // namespace communication_interfaces::sockets

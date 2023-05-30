@@ -24,13 +24,9 @@ public:
 
   /**
    * @copydoc ISocket::open()
+   * @details Connect the client socket to the server
    */
   void open() override;
-
-  /**
-   * @brief Connect the client socket to the server
-   */
-  void connect() override;
 
 private:
   TCPClientConfiguration config_; ///< Socket configuration struct

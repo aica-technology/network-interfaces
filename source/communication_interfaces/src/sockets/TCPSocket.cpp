@@ -7,8 +7,7 @@
 
 namespace communication_interfaces::sockets {
 
-TCPSocket::TCPSocket(int buffer_size) :
-    server_address_(), socket_fd_(), connected_(), buffer_size_(buffer_size) {
+TCPSocket::TCPSocket(int buffer_size) : server_address_(), socket_fd_(), buffer_size_(buffer_size) {
   if (buffer_size <= 0) {
     throw exceptions::SocketConfigurationException("Configuration parameter 'buffer_size' has to be greater than 0.");
   }
@@ -18,14 +17,7 @@ TCPSocket::~TCPSocket() {
   TCPSocket::close();
 }
 
-bool TCPSocket::is_connected() const {
-  return this->connected_;
-}
-
 bool TCPSocket::receive_bytes(std::string& buffer) {
-  if (!connected_) {
-    return false;
-  }
   std::vector<char> local_buffer(this->buffer_size_);
   auto receive_length = recv(this->socket_fd_, local_buffer.data(), this->buffer_size_, 0);
   if (receive_length < 0) {
@@ -36,9 +28,6 @@ bool TCPSocket::receive_bytes(std::string& buffer) {
 }
 
 bool TCPSocket::send_bytes(const std::string& buffer) {
-  if (!connected_) {
-    return false;
-  }
   int send_length = send(this->socket_fd_, buffer.data(), buffer.size(), 0);
   return send_length == static_cast<int>(buffer.size());
 }

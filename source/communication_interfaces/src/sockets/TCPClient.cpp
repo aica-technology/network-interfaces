@@ -24,12 +24,9 @@ void TCPClient::open() {
   if (this->socket_fd_ < 0) {
     throw exceptions::SocketConfigurationException("Opening socket failed");
   }
-}
 
-void TCPClient::connect() {
   if (::connect(this->socket_fd_, (sockaddr*) &this->server_address_, sizeof(this->server_address_)) != 0) {
     throw exceptions::SocketConfigurationException("Connecting client failed");
   }
-  this->connected_ = true;
 }
 } // namespace communication_interfaces::sockets

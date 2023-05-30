@@ -41,9 +41,6 @@ void TCPServer::open() {
   }
   // listen for only 1 request at a time
   listen(this->server_fd_, 1);
-}
-
-void TCPServer::connect() {
   // receive a request from client using accept
   sockaddr_in new_socket_address{};
   socklen_t new_addr_len = sizeof(new_socket_address);
@@ -52,7 +49,6 @@ void TCPServer::connect() {
   if (this->socket_fd_ < 0) {
     throw exceptions::SocketConfigurationException("Connecting server failed");
   }
-  this->connected_ = true;
 }
 
 void TCPServer::close() {

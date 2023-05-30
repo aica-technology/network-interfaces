@@ -29,14 +29,10 @@ public:
 
   /**
    * @copydoc ISocket::open()
+   * @details Wait for connection requests from clients and accept new connections. This method blocks until a
+   * connection is established
    */
   void open() override;
-
-  /**
-   * @brief Wait for connection requests from clients and accept new connections
-   * @details This method blocks until a connection is established
-   */
-  void connect() override;
 
   /**
    * @brief Close the sockets
