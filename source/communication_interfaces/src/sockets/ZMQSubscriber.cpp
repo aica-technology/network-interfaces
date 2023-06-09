@@ -6,9 +6,9 @@ ZMQSubscriber::ZMQSubscriber(ZMQSocketConfiguration configuration) : ZMQSocket(s
 
 void ZMQSubscriber::open() {
   this->socket_ = std::make_shared<zmq::socket_t>(*this->config_.context, ZMQ_SUB);
-  this->open_socket();
   this->socket_->set(zmq::sockopt::conflate, 1);
   this->socket_->set(zmq::sockopt::subscribe, "");
+  this->open_socket();
 }
 
 bool ZMQSubscriber::send_bytes(const std::string&) {
