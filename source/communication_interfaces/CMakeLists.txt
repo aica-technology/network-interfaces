@@ -42,8 +42,6 @@ if (NOT cppzmq_POPULATED) # provided by parent CMakeLists.txt (if used)
   add_project_dependency(cppzmq 4.7.1 REQUIRED)
 endif()
 
-include_directories(include)
-
 add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
@@ -55,7 +53,10 @@ add_library(${PROJECT_NAME} SHARED
         ${PROJECT_SOURCE_DIR}/src/sockets/TCPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/TCPClient.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/TCPServer.cpp)
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 target_link_libraries(${PROJECT_NAME} PUBLIC cppzmq)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
@@ -74,6 +75,18 @@ if(BUILD_TESTING)
     add_test(NAME test_${PROJECT_NAME} COMMAND test_${PROJECT_NAME})
 endif()
 
+# export the target and its associated config (includes, linked libraries, etc)
+install(TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}Targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(EXPORT ${PROJECT_NAME}Targets
+  FILE ${PROJECT_NAME}Targets.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
 
 # generate the version file for the config file
 write_basic_package_version_file(
