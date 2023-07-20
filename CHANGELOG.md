@@ -2,11 +2,23 @@
 
 Release Versions:
 
+- [1.4.0](#140)
+- [1.3.0](#130)
 - [1.2.0](#120)
 - [1.1.0](#110)
 - [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 1.4.0
+
+Version 1.4.0 includes a first stable version of communication interfaces.
+
+## 1.3.0
+
+Version 1.3.0 introduces the first version of the communication_interfaces library, which is a more standalone and
+versatile alternative of network_interfaces for socket communication. It doesn't have dependencies on control libraries
+or clproto. Additionally, the release includes automated builds for the CI.
 
 ## 1.2.0
 

@@ -16,7 +16,7 @@ jobs:
       tag: ${{ steps.parse-tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: aica-technology/.github/.github/actions/docker-tag-from-git@v0.5.0
+      - uses: aica-technology/.github/.github/actions/docker-tag-from-git@v0.6.1
         id: parse-tag
 
   build:
