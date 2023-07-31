@@ -1,4 +1,5 @@
 FROM ghcr.io/aica-technology/ros2-modulo-control:humble as base
+USER ${USER}
 
 FROM base as apt-dependencies
 RUN <<HEREDOC
@@ -52,19 +53,21 @@ xargs -a /tmp/new-packages.txt dpkg-query -L \
 HEREDOC
 
 FROM base as python
-COPY --chown=${USER} ./python /python
+COPY --chown=${USER}:${USER} ./python /python
 RUN \
   --mount=type=cache,target=${HOME}/.cache,id=pip-${TARGETPLATFORM},uid=1000 \
   --mount=type=ssh,uid=1000 \
   python3 -m pip install --prefix=/tmp/python /python
+RUN mkdir -p /tmp/python-home/${USER}/.local/lib/python3.10/ \
+  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${USER}/.local/lib/python3.10/site-packages/
 
 FROM base as code
 WORKDIR /src
 COPY --from=apt-dependencies /tmp/apt /
-COPY --chown=${USER} . /src
+COPY --chown=${USER}:${USER} . /src
 
 FROM code as development
-COPY --from=python /tmp/python/local/lib/python3.10/dist-packages/ ${HOME}/.local/lib/python3.10/site-packages/
+COPY --from=python /tmp/python-home/ /home
 
 FROM code as build
 RUN \
@@ -79,7 +82,7 @@ RUN \
   --mount=type=ssh,uid=1000 \
   cmake -B build -DBUILD_TESTING=ON \
   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target all test
-COPY --from=python /tmp/python/local/lib/python3.10/dist-packages/ ${HOME}/.local/lib/python3.10/site-packages/
+COPY --from=python /tmp/python-home/ /home
 RUN python3 -m unittest discover python/test --verbose
 
 FROM build as install
@@ -92,4 +95,4 @@ RUN \
 FROM scratch as production
 COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/net-ifaces /usr/local
-COPY --from=python /tmp/python/local/lib/python3.10/dist-packages/ /home/ros2/.local/lib/python3.10/site-packages/
+COPY --from=python /tmp/python-home/ /home
