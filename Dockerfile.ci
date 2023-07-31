@@ -58,9 +58,8 @@ RUN \
   --mount=type=cache,target=${HOME}/.cache,id=pip-${TARGETPLATFORM},uid=1000 \
   --mount=type=ssh,uid=1000 \
   python3 -m pip install --prefix=/tmp/python /python
-RUN mkdir -p /tmp/python-home/${HOME}/.local/lib/python3.10/ \
-  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${HOME}/.local/lib/python3.10/site-packages/ \
-  && sudo chown root:root /tmp/python-home/home/
+RUN mkdir -p /tmp/python-home/${USER}/.local/lib/python3.10/ \
+  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${USER}/.local/lib/python3.10/site-packages/
 
 FROM base as code
 WORKDIR /src
@@ -68,7 +67,7 @@ COPY --from=apt-dependencies /tmp/apt /
 COPY --chown=${USER}:${USER} . /src
 
 FROM code as development
-COPY --from=python /tmp/python/local/lib/python3.10/dist-packages/ ${HOME}/.local/lib/python3.10/site-packages/
+COPY --from=python /tmp/python-home/ /home
 
 FROM code as build
 RUN \
@@ -83,7 +82,7 @@ RUN \
   --mount=type=ssh,uid=1000 \
   cmake -B build -DBUILD_TESTING=ON \
   && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target all test
-COPY --from=python /tmp/python/local/lib/python3.10/dist-packages/ ${HOME}/.local/lib/python3.10/site-packages/
+COPY --from=python /tmp/python-home/ /home
 RUN python3 -m unittest discover python/test --verbose
 
 FROM build as install
@@ -96,4 +95,4 @@ RUN \
 FROM scratch as production
 COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/net-ifaces /usr/local
-COPY --from=python /tmp/python-home/ /
+COPY --from=python /tmp/python-home/ /home
