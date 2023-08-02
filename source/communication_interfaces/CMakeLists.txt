@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(COMMUNICATION_INTERFACES_VERSION 0.0.2)
+set(COMMUNICATION_INTERFACES_VERSION 0.0.3)
 project(communication_interfaces VERSION ${COMMUNICATION_INTERFACES_VERSION})
 
 option(BUILD_TESTING "Build tests." OFF)

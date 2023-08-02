@@ -2,6 +2,7 @@
 
 Release Versions:
 
+- [1.4.1](#141)
 - [1.4.0](#140)
 - [1.3.0](#130)
 - [1.2.0](#120)
@@ -9,6 +10,10 @@ Release Versions:
 - [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 1.4.1
+
+Version 1.4.1 includes two fixes to the CI that are required downstream.
 
 ## 1.4.0
 
