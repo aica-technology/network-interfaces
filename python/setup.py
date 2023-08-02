@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="network_interfaces",
-    version="1.4.0",
+    version="1.4.1",
     description="This package implements network interfaces of AICA",
     maintainer="Dominic Reber",
     maintainer_email="dominic@aica.tech",
