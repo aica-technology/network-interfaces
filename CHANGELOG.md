@@ -14,6 +14,7 @@ Release Versions:
 ## Upcoming changes
 
 - refactor!: remove network interfaces (#56)
+- feat: add python bindings and tests (#57)
 
 ## 1.4.1
 
