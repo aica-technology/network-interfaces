@@ -1,6 +1,0 @@
-@PACKAGE_INIT@
-
-set(network_interfaces_LIBRARIES cppzmq clproto state_representation)
-
-include(CMakeFindDependencyMacro)
-find_dependency(cppzmq)

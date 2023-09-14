@@ -37,8 +37,17 @@ endmacro()
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FindPkgConfig)
+include(FetchContent)
 
-if (NOT cppzmq_POPULATED) # provided by parent CMakeLists.txt (if used)
+option(CPPZMQ_BUILD_TESTS OFF)
+FetchContent_Declare(
+  cppzmq
+  GIT_REPOSITORY https://github.com/zeromq/cppzmq/
+  GIT_TAG        v4.7.1
+)
+FetchContent_MakeAvailable(cppzmq)
+
+if (NOT cppzmq_POPULATED)
   add_project_dependency(cppzmq 4.7.1 REQUIRED)
 endif()
 
