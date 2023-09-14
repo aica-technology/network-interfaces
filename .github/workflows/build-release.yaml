@@ -3,7 +3,7 @@ name: Build and Push Multi-Arch Images
 on:
   push:
     branches:
-      - develop
+      # - develop
       - main
     tags:
       - "v*.*.*"

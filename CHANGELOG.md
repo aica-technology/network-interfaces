@@ -11,6 +11,10 @@ Release Versions:
 - [0.2.0](#020)
 - [0.1.0](#010)
 
+## Upcoming changes
+
+- refactor!: remove network interfaces (#56)
+
 ## 1.4.1
 
 Version 1.4.1 includes two fixes to the CI that are required downstream.
