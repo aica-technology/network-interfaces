@@ -35,7 +35,6 @@ setup(
     author_email='dominic@aica.tech',
     url='https://github.com/aica-technology/network-interfaces',
     description='Python bindings for the C++ communication interfaces',
-    long_description='',
     ext_modules=ext_modules,
     extras_require={"test": "pytest"},
     cmdclass={"build_ext": build_ext},
