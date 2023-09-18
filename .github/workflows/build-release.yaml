@@ -42,7 +42,7 @@ jobs:
         with:
           image_name: aica-technology/network-interfaces
           image_tags: ${{ steps.merge-tags.outputs.list }}
-          dockerfile_path: Dockerfile.ci
+          dockerfile_path: Dockerfile
           token: ${{ secrets.GITHUB_TOKEN }}
 
   multi-arch:
