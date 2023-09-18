@@ -2,67 +2,104 @@
 
 A repository of drivers, protocols and libraries for communicating between software and hardware devices.
 
-## Installation and usage
+## communication_interfaces
 
-This project depends on the `state_representation` and `clproto` libraries from
-[control libraries](https://github.com/aica-technology/control-libraries) in C++ as well as Python. Before installing the
-network interfaces libraries, install therefore the two modules mentioned above as well as their Python bindings.
-Afterwards, the installation is straight forward:
+A library for simple socket communication. It currently implements sockets for UPD, TCP, and ZMQ communication.
 
-```console
-[sudo] bash install.sh -y
+### Socket interface
+
+The `ISocket` class is an interface for simple socket communication, defining functions for opening a socket,
+sending and receiving bytes, and closing the socket connection.
+
+The `ISocket` class defines an `open()` method to perform configuration steps to open the socket for communication.
+If opening the socket fails, an exception is thrown. The `close()` method is also provided to perform steps to disconnect
+and close the socket communication.
+
+The functions `receive_bytes(std::string&)` and `send_bytes(const std::string&)` perform the read and write logic of the socket
+respectively.
+
+#### Implementing a derived socket class
+
+To use this class, create a subclass that inherits from it and implement its pure virtual functions. The pure virtual
+functions are `open()`, `receive_bytes(std::string&)`, and `send_bytes(const std::string&)`.
+
+Configuration parameters should be passed with a configuration struct, resulting in a single argument constructor.
+
+The `close()` function can optionally be overridden to perform steps to disconnect and close the socket communication.
+If a derived class defines any cleanup behavior in `close()`, it should also be invoked statically and explicitly
+in the destructor of the derived class.
+
+An example is given below.
+
+```c++
+// DerivedSocket.hpp
+
+struct DerivedSocketConfig {
+  int param1;
+  double param2;
+};
+
+class DerivedSocket : ISocket {
+public:
+  DerivedSocket(DerivedSocketConfig configuration);
+  
+  ~DerivedSocket() override;
+  
+  void open() override;
+  
+  bool receive_bytes(std::string& buffer) override;
+
+  bool send_bytes(const std::string& buffer) override;
+  
+  void close() override;
+}
 ```
 
-Run `bash install.sh -h` for help with this process.
+```c++
+// DerivedSocket.cpp
+DerivedSocket::DerivedSocket(DerivedSocketConfig configuraiton) {
+  // save configuration parameters for later use
+}
 
-### ZMQ loopback scripts
+DerivedSocket::~DerivedSocket() {
+  DerivedSocket::close();
+}
 
-Both the C++ and Python directory contain *loopback* executables that subscribe to the state (or command)
-and publish a command (or state) in and endless loop. They can be used to check if the robot and the user are connected
-and receive each other's messages correctly. To run the scripts, make the CMake project and/or install the Python
-project, and then choose one of the following:
+void DerivedSocket::open() {
+  // Configure and open the socket
+}
 
+bool DerivedSocket::receive_bytes(std::string& buffer) {
+  // Read the contents of the socket into the buffer and return true on success. Otherwise, return false.
+  return true;
+}
+
+bool DerivedSocket::send_bytes(const std::string& buffer) {
+  // Write the contents of the buffer onto the socket and return true on success. Otherwise, return false.
+  return true;
+}
+
+void DerivedSocket::close() {
+  // Perform clean-up steps here
+}
 ```
-cd path/to/cpp/build
-./zmq_loopback_state state_uri command_uri
-./zmq_loopback_command state_uri command_uri
 
-cd path/to/python/scripts
-python3 zmq_loopback_state.py state_uri command_uri
-python3 zmq_loopback_command.py state_uri command_uri
-```
+## Notes on ZMQ communication
 
-Note that the scripts are provided with a correct combination of state and command URIs. There are examples of such
-combinations below. Assume the robot state is on port 1601 and the command on 1602:
+It can be difficult to set up a working configuration for ZMQ communication. The examples below assume that there are
+two ZMQ sockets, one that has the robot state is on port 1601 and the command on 1602:
 
 #### Everything runs in one container / on the same host (network independent)
 
 If all applications run in the same container, or on the same host, the situation is:
 
 - The robot publishes its state on `0.0.0.0:1601` and listens to commands on `0.0.0.0:1602` with both sockets
-  non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to receive and
-  print the robot's state.
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or
-  `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
-  state.
+  non-binding.
+- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding.
 
 #### One or more containers and host, all on host network and with no hostname
 
 Same as above.
-
-#### One container with host (container not on host network)
-
-The container is an SSH server or needs to be on a user-defined network, but the robot is connected directly to the host
-machine. This is almost the same case as above:
-
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command 0.0.0.0:1601 0.0.0.0:1602` or
-  `python3 zmq_loopback_command.py 0.0.0.0:1601 0.0.0.0:1602` to receive and print the command and send back a random
-  state.
-
-There is one important difference though: The container needs to bind ports 1601 and 1602 (i.e.
-add `-p1601:1601 -p1602:1602` to the `docker run` command) explicitly such that the communication goes through.
 
 #### Several containers, user-defined bridge network with hostnames
 
@@ -71,32 +108,11 @@ of the binding sockets. For example, if the containers are running on network *a
 *controller*, respectively.
 
 - The robot publishes its state on `controller.aicanet:1601` and listens to commands on `controller.aicanet:1602` with
-  both sockets non-binding: run `./zmq_loopback_state *:1601 *:1602` or `python3 zmq_loopback_state.py *:1601 *:1602` to
-  receive and print the robot's state.
-- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding:
-  run `./zmq_loopback_command controller.aicanet:1601 controller.aicanet:1602` or `
-  python3 zmq_loopback_command.py controller.aicanet:1601 controller.aicanet:1602` to receive and print the command and
-  send back a random state.
+  both sockets non-binding.
+- The controller sends the command on `*:1602` and receives the state on `*:1601` with both sockets binding.
 
 #### Note
 
 - This list of combinations is not exhaustive.
 - The binding sockets always have a URI like `*:port` whilst the connecting sockets need to provide the complete address
   version (`0.0.0.0:port` if on localhost or `hostname.network:port` if on bridge network).
-
-## Development
-
-Build and run a Docker container as an SSH toolchain server for remote development with:
-
-```console
-bash dev-server.sh
-```
-
-Note: This requires the installation of the `aica-docker` scripts
-from [here](https://github.com/aica-technology/docker-images).
-
-Additionally, to run the tests without an SSH toolchain server, build an image with:
-
-```console
-bash build-test.sh
-```
