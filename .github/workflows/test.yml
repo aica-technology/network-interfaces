@@ -9,8 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - run: |
-          git fetch origin main ${{ github.event.pull_request.base.sha }}
           PACKAGE_DIFF=$(git diff ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- ./source)
           PACKAGE_DIFF+=$(git diff ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- ./python)
           CL_DIFF=$(git diff ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- CHANGELOG.md)
@@ -33,7 +34,7 @@ jobs:
 
   test:
     needs: check-skippable-changes
-    if: ${{ needs.check-skippable-changes.outputs.skip == 'true' }}
+    if: ${{ needs.check-skippable-changes.outputs.skip != 'true' }}
     runs-on: ubuntu-latest
     name: Run tests
     steps:
