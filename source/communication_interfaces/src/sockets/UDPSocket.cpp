@@ -78,6 +78,7 @@ bool UDPSocket::sendto(const sockaddr_in& address, const std::string& buffer) co
 void UDPSocket::close() {
   if (this->server_fd_ >= 0) {
     ::close(this->server_fd_);
+    this->server_fd_ = -1;
   }
 }
 } // namespace communication_interfaces::sockets
