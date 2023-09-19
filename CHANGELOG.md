@@ -16,6 +16,7 @@ Release Versions:
 - refactor!: remove network interfaces (#56)
 - feat: add python bindings and tests (#57)
 - build: rename Dockerfile and update helper scripts (#58)
+- ci: add workflow to run tests on PR event (#60)
 
 ## 1.4.1
 
