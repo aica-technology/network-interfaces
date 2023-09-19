@@ -93,7 +93,43 @@ COPY --from=python /tmp/python-home/ /home
 COPY --from=python /python/test /python/test
 RUN python3 -m pytest /python/test --verbose
 
+FROM base as python-stubs
+ARG TARGETPLATFORM
+ARG CACHEID
+COPY --from=apt-dependencies /tmp/apt /
+COPY --from=install /tmp/communication-interfaces /usr
+COPY --from=python /tmp/python-home /home
+RUN sudo pip install pybind11-stubgen
+RUN --mount=type=cache,target=${HOME}/.cache,id=pip-${TARGETPLATFORM}-${CACHEID},uid=1000 \
+<<HEREDOC
+python3 -c "import communication_interfaces"
+if [ $? -eq 0 ]; then
+  pybind11-stubgen communication_interfaces -o ./stubs
+  mv ./stubs/communication_interfaces ./stubs/communication_interfaces-stubs
+  cat << EoF > ./stubs/setup.py
+from distutils.core import setup
+
+import communication_interfaces
+
+
+setup(
+    name="communication_interfaces-stubs",
+    author="Dominic Reber",
+    author_email="dominic@aica.tech",
+    version=communication_interfaces.__version__,
+    package_data={"communication_interfaces-stubs": ["*.pyi"]},
+    packages=["communication_interfaces-stubs"]
+)
+EoF
+  python3 -m pip install --prefix=/tmp/python ./stubs || exit 1
+  rm -r ./stubs
+fi
+HEREDOC
+RUN mkdir -p /tmp/python-home/${USER}/.local/lib/python3.10/ \
+  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${USER}/.local/lib/python3.10/site-packages/
+
 FROM scratch as production
 COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/communication-interfaces /usr/local
 COPY --from=python /tmp/python-home/ /home
+COPY --from=python-stubs /tmp/python-home /home
