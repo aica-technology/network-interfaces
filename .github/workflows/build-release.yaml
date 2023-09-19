@@ -19,7 +19,7 @@ jobs:
         id: parse-tag
 
   build:
-    needs: [get-tag]
+    needs: [ get-tag ]
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -48,7 +48,7 @@ jobs:
   multi-arch:
     runs-on: ubuntu-latest
     name: Merge into a multi-arch image
-    needs: [get-tag, build]
+    needs: [ get-tag, build ]
     steps:
       - uses: aica-technology/.github/.github/actions/ghcr-manifest-merge@v0.6.1
         with:
