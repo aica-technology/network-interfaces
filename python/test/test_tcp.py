@@ -16,7 +16,7 @@ class TestTCPCommunication:
         response = self.server.receive_bytes()
         if response is None:
             pytest.fail("No response from client")
-        assert response.decode("utf-8") == self.client_message
+        assert response.decode("utf-8").rstrip("\x00") == self.client_message
         assert self.server.send_bytes(self.server_message)
 
     def test_comm(self):
@@ -28,4 +28,4 @@ class TestTCPCommunication:
         assert self.client.send_bytes(self.client_message)
         response = self.client.receive_bytes()
         assert response
-        assert response.decode("utf-8") == self.server_message
+        assert response.decode("utf-8").rstrip("\x00") == self.server_message

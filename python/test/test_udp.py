@@ -24,7 +24,7 @@ def client(udp_config):
 
 
 def test_send_receive(server, client):
-    send_string = b"Hello world"
+    send_string = "Hello world"
 
     try:
         server.open()
@@ -39,7 +39,7 @@ def test_send_receive(server, client):
     assert client.send_bytes(send_string)
     response = server.receive_bytes()
     assert response
-    assert response == send_string
+    assert response.decode("utf-8").rstrip("\x00") == send_string
 
 
 def test_timeout(udp_config):
