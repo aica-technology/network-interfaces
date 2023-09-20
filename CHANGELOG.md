@@ -2,6 +2,7 @@
 
 Release Versions:
 
+- [2.0.0](#200)
 - [1.4.1](#141)
 - [1.4.0](#140)
 - [1.3.0](#130)
@@ -11,12 +12,28 @@ Release Versions:
 - [0.2.0](#020)
 - [0.1.0](#010)
 
-## Upcoming changes
+## 2.0.0
+
+Version 2.0.0 is a major update to this repository and contains breaking changes.
+
+### Breaking changes
+
+The `network_interfaces` library has been completely removed in favor of `communication_interfaces`.
 
 - refactor!: remove network interfaces (#56)
+
+### Features
+
+The `communication_interfaces` library is now at version 1.0.0 and now comes with Python bindings generated with Pybind.
+Additionally, stubs are automatically created for development purposes.
+
 - feat: add python bindings and tests (#57)
+- feat(python): add stage to generate python stubs (#59)
+
+### Behind the scenes
+
 - build: rename Dockerfile and update helper scripts (#58)
-- ci: add workflow to run tests on PR event (#60)
+- ci: add workflow to run tests on PR event (#60, #61)
 
 ## 1.4.1
 
