@@ -16,11 +16,11 @@ Release Versions:
 
 Version 2.0.0 is a major update to this repository and contains breaking changes.
 
-- refactor!: remove network interfaces (#56)
-
 ### Breaking changes
 
 The `network_interfaces` library has been completely removed in favor of `communication_interfaces`.
+
+- refactor!: remove network interfaces (#56)
 
 ### Features
 
