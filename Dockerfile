@@ -87,7 +87,7 @@ FROM build as test
 ARG TARGETPLATFORM
 ARG CACHEID
 RUN --mount=type=cache,target=./build,id=cmake-${TARGETPLATFORM}-${CACHEID},uid=1000 \
-  cmake -B build -DBUILD_TESTING=ON && CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test
+  cmake -B build -DBUILD_TESTING=ON && cd build && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 COPY --from=install /tmp/communication-interfaces /usr/local
 COPY --from=python /tmp/python-home/ /home
 COPY --from=python /python/test /python/test
