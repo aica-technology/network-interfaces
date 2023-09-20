@@ -2,6 +2,7 @@
 
 Release Versions:
 
+- [2.0.1](#201)
 - [2.0.0](#200)
 - [1.4.1](#141)
 - [1.4.0](#140)
@@ -11,6 +12,13 @@ Release Versions:
 - [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 2.0.1
+
+Version 2.0.1 contains a hotfix that enables socket communiction with any serialized message in Python, which was not
+possible before due to an error in the bindings.
+
+- fix(python): avoid removal of null characters in bindings (#66)
 
 ## 2.0.0
 

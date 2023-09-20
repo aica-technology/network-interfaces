@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME=ghcr.io/aica-technology/communication-interfaces
+IMAGE_NAME=ghcr.io/aica-technology/network-interfaces
 IMAGE_TAG=latest
 
 ROS2_VERSION=humble

@@ -44,7 +44,6 @@ PYBIND11_MODULE(communication_interfaces, m) {
             std::string buffer;
             auto res = socket.receive_bytes(buffer);
             if (res) {
-              buffer.erase(std::find(buffer.begin(), buffer.end(), '\0'), buffer.end());
               return py::bytes(buffer);
             } else {
               return py::none();
