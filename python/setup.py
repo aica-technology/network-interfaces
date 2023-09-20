@@ -6,7 +6,7 @@ import pkgconfig
 from pybind11.setup_helpers import ParallelCompile, Pybind11Extension, build_ext, naive_recompile
 from setuptools import setup
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 try:
     status = pkgconfig.installed('communication_interfaces', f'>= {__version__}')
