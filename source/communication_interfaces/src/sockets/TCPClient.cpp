@@ -8,7 +8,7 @@ namespace communication_interfaces::sockets {
 
 TCPClient::TCPClient(TCPClientConfiguration configuration) : TCPSocket(configuration.buffer_size), config_(configuration) {}
 
-void TCPClient::open() {
+void TCPClient::on_open() {
   try {
     bzero((char*) &this->server_address_, sizeof(this->server_address_));
     this->server_address_.sin_family = AF_INET;

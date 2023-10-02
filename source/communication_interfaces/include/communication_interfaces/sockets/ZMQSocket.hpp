@@ -29,21 +29,6 @@ public:
    */
   ~ZMQSocket() override;
 
-  /**
-   * @brief Close the socket
-   */
-  void close() override;
-
-  /**
-   * @copydoc ISocket::receive_bytes(std::string&)
-   */
-  bool receive_bytes(std::string& buffer) override;
-
-  /**
-   * @copydoc ISocket::send_bytes(const std::string&)
-   */
-  bool send_bytes(const std::string& buffer) override;
-
 protected:
   /**
    * @brief Constructor taking the configuration struct
@@ -58,5 +43,21 @@ protected:
 
   ZMQSocketConfiguration config_; ///< Socket configuration struct
   std::shared_ptr<zmq::socket_t> socket_; ///< ZMQ socket
+
+private:
+  /**
+   * @copydoc ISocket::on_receive_bytes(std::string&)
+   */
+  bool on_receive_bytes(std::string& buffer) override;
+
+  /**
+   * @copydoc ISocket::on_send_bytes(const std::string&)
+   */
+  bool on_send_bytes(const std::string& buffer) override;
+
+  /**
+   * @copydoc ISocket::on_close()
+   */
+  void on_close() override;
 };
 } // namespace communication_interfaces::sockets

@@ -12,10 +12,10 @@ TCPServer::TCPServer(TCPServerConfiguration configuration) :
 }
 
 TCPServer::~TCPServer() {
-  TCPServer::close();
+  TCPServer::on_close();
 }
 
-void TCPServer::open() {
+void TCPServer::on_open() {
   try {
     bzero((char*) &this->server_address_, sizeof(this->server_address_));
     this->server_address_.sin_family = AF_INET;
@@ -51,8 +51,8 @@ void TCPServer::open() {
   }
 }
 
-void TCPServer::close() {
+void TCPServer::on_close() {
   ::close(this->server_fd_);
-  TCPSocket::close();
+  TCPSocket::on_close();
 }
 } // namespace communication_interfaces::sockets

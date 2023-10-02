@@ -15,19 +15,20 @@ public:
    */
   UDPClient(UDPSocketConfiguration configuration);
 
+private:
   /**
-   * @copydoc ISocket::open()
+   * @copydoc ISocket::on_open()
    */
-  void open() override;
+  void on_open() override;
 
   /**
-   * @copydoc ISocket::receive_bytes(std::string&)
+   * @copydoc ISocket::on_receive_bytes(std::string&)
    */
-  bool receive_bytes(std::string& buffer) override;
+  bool on_receive_bytes(std::string& buffer) override;
 
   /**
-   * @copydoc ISocket::send_bytes(const std::string&)
+   * @copydoc ISocket::on_send_bytes(const std::string&)
    */
-  bool send_bytes(const std::string& buffer) override;
+  bool on_send_bytes(const std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

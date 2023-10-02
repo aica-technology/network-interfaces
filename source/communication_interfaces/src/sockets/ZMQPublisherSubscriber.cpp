@@ -21,20 +21,20 @@ ZMQPublisherSubscriber::~ZMQPublisherSubscriber() {
   ZMQPublisherSubscriber::close();
 }
 
-void ZMQPublisherSubscriber::open() {
+void ZMQPublisherSubscriber::on_open() {
   this->pub_->open();
   this->sub_->open();
 }
 
-bool ZMQPublisherSubscriber::receive_bytes(std::string& buffer) {
+bool ZMQPublisherSubscriber::on_receive_bytes(std::string& buffer) {
   return this->sub_->receive_bytes(buffer);
 }
 
-bool ZMQPublisherSubscriber::send_bytes(const std::string& buffer) {
+bool ZMQPublisherSubscriber::on_send_bytes(const std::string& buffer) {
   return this->pub_->send_bytes(buffer);
 }
 
-void ZMQPublisherSubscriber::close() {
+void ZMQPublisherSubscriber::on_close() {
   this->pub_->close();
   this->sub_->close();
 }

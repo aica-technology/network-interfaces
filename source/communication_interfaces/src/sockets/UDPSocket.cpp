@@ -17,7 +17,7 @@ UDPSocket::UDPSocket(UDPSocketConfiguration configuration) :
 }
 
 UDPSocket::~UDPSocket() {
-  UDPSocket::close();
+  UDPSocket::on_close();
 }
 
 void UDPSocket::open_socket(bool bind_socket) {
@@ -75,7 +75,7 @@ bool UDPSocket::sendto(const sockaddr_in& address, const std::string& buffer) co
   return send_length == static_cast<int>(buffer.size());
 }
 
-void UDPSocket::close() {
+void UDPSocket::on_close() {
   if (this->server_fd_ >= 0) {
     ::close(this->server_fd_);
     this->server_fd_ = -1;

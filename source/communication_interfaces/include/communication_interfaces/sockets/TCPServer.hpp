@@ -27,19 +27,20 @@ public:
    */
   ~TCPServer() override;
 
+private:
   /**
-   * @copydoc ISocket::open()
+   * @copydoc ISocket::on_open()
    * @details Wait for connection requests from clients and accept new connections. This method blocks until a
    * connection is established
    */
-  void open() override;
+  void on_open() override;
 
   /**
-   * @brief Close the sockets
+   * @copydoc ISocket::on_close()
    */
-  void close() override;
+  void on_close() override;
 
-private:
+
   TCPServerConfiguration config_; ///< Socket configuration struct
   int server_fd_; ///< File descriptor of the connected server socket
 };
