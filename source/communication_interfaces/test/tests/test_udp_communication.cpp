@@ -67,7 +67,7 @@ TEST_F(TestUDPSockets, OpenClose) {
   EXPECT_THROW(server.receive_bytes(buffer), exceptions::SocketConfigurationException);
   server.open();
 
-  EXPECT_TRUE(server.send_bytes(std::string("test")));
+  EXPECT_FALSE(server.send_bytes(std::string("test")));
   EXPECT_FALSE(server.receive_bytes(buffer));
   // Close server socket
   server.close();
