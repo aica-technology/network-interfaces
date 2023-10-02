@@ -60,8 +60,35 @@ def test_port_reuse(udp_config, server):
         server2.open()
 
 
-def test_open_close(server):
+def test_open_close(udp_config):
+    buffer = ""
+    udp_config.timeout_duration_sec = 0.5
+    server = UDPServer(udp_config)
+    with pytest.raises(SocketConfigurationError):
+        server.send_bytes(buffer)
+    with pytest.raises(SocketConfigurationError):
+        server.receive_bytes()
     server.open()
-    server.close()
+    assert server.send_bytes("test")
+    assert not server.receive_bytes()
 
-    assert not server.send_bytes("")
+    server.close()
+    with pytest.raises(SocketConfigurationError):
+        server.send_bytes(buffer)
+    with pytest.raises(SocketConfigurationError):
+        server.receive_bytes()
+
+    client = UDPClient(udp_config)
+    with pytest.raises(SocketConfigurationError):
+        client.send_bytes(buffer)
+    with pytest.raises(SocketConfigurationError):
+        client.receive_bytes()
+    client.open()
+    assert client.send_bytes("test")
+    assert not client.receive_bytes()
+
+    client.close()
+    with pytest.raises(SocketConfigurationError):
+        client.send_bytes(buffer)
+    with pytest.raises(SocketConfigurationError):
+        client.receive_bytes()

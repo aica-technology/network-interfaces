@@ -1,6 +1,7 @@
 import pytest
 import time
 
+from communication_interfaces.exceptions import SocketConfigurationError
 from communication_interfaces.sockets import ZMQContext, ZMQSocketConfiguration, ZMQPublisher, ZMQSubscriber, \
     ZMQCombinedSocketsConfiguration, ZMQPublisherSubscriber
 
@@ -71,3 +72,18 @@ def test_send_receive_combined(zmq_context):
 
     server.close()
     client.close()
+
+
+def test_open_close(zmq_config):
+    buffer = ""
+    socket = ZMQPublisher(zmq_config)
+    with pytest.raises(SocketConfigurationError):
+        socket.send_bytes(buffer)
+    with pytest.raises(SocketConfigurationError):
+        socket.receive_bytes()
+
+    socket.open()
+    assert socket.send_bytes("test")
+    socket.close()
+    with pytest.raises(SocketConfigurationError):
+        socket.send_bytes(buffer)

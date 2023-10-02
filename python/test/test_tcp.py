@@ -2,6 +2,7 @@ import multiprocessing
 import pytest
 import time
 
+from communication_interfaces.exceptions import SocketConfigurationError
 from communication_interfaces.sockets import TCPClientConfiguration, TCPClient, TCPServerConfiguration, TCPServer
 
 
@@ -29,3 +30,27 @@ class TestTCPCommunication:
         response = self.client.receive_bytes()
         assert response
         assert response.decode("utf-8").rstrip("\x00") == self.server_message
+
+        buffer = ""
+        self.server.close()
+        with pytest.raises(SocketConfigurationError):
+            self.server.receive_bytes()
+        with pytest.raises(SocketConfigurationError):
+            self.server.send_bytes(buffer)
+        self.client.close()
+        with pytest.raises(SocketConfigurationError):
+            self.client.receive_bytes()
+        with pytest.raises(SocketConfigurationError):
+            self.client.send_bytes(buffer)
+
+    def test_not_open(self):
+        buffer = ""
+        with pytest.raises(SocketConfigurationError):
+            self.server.receive_bytes()
+        with pytest.raises(SocketConfigurationError):
+            self.server.send_bytes(buffer)
+
+        with pytest.raises(SocketConfigurationError):
+            self.client.receive_bytes()
+        with pytest.raises(SocketConfigurationError):
+            self.client.send_bytes(buffer)
