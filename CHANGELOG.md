@@ -13,6 +13,10 @@ Release Versions:
 - [0.2.0](#020)
 - [0.1.0](#010)
 
+## Upcoming changes (in development)
+
+- feat: add is_opened flag to socket base class (#68)
+
 ## 2.0.1
 
 Version 2.0.1 contains a hotfix that enables socket communiction with any serialized message in Python, which was not
