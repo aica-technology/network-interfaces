@@ -7,19 +7,19 @@ ROS2_VERSION=humble
 
 HELP_MESSAGE="Usage: build.sh [options]
 Options:
-  --test                      Target the test layer to run the tests.
+  --test                    Target the test layer to run the tests.
 
-  --ros2-version <VERSION>    Specify the version of ROS 2 to use.
-                              (default: $ROS2_VERSION)
+  --ros2-version <VERSION>  Specify the version of ROS 2 to use.
+                            (default: $ROS2_VERSION)
 
-  -v|--verbose             Set the build output to verbose.
+  -v|--verbose              Set the build output to verbose.
 
-  --cache-id <id>          Invalidate the mount cache (e.g. CMake build folder)
-                           by providing a new value.
+  --cache-id <id>           Invalidate the mount cache (e.g. CMake build folder)
+                            by providing a new value.
 
-  -r|--no-cache            Invalidate all cache (layer + mount).
+  -r|--no-cache             Invalidate all cache (layer + mount).
 
-  -h|--help                Show this help message.
+  -h|--help                 Show this help message.
 "
 
 TEST=0

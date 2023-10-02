@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "AMD",
+            "includePath": [
+                "/home/ros2/.devcontainer/source/communication_interfaces/include/**"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
