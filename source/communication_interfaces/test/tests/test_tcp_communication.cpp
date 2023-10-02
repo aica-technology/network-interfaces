@@ -51,4 +51,22 @@ TEST_F(TestTCPSockets, TestCommunication) {
 
   client.join();
   server.join();
+
+  std::string buffer;
+  this->server_->close();
+  EXPECT_THROW(this->server_->receive_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(this->server_->send_bytes(buffer), exceptions::SocketConfigurationException);
+  this->client_->close();
+  EXPECT_THROW(this->client_->receive_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(this->client_->send_bytes(buffer), exceptions::SocketConfigurationException);
+}
+
+TEST_F(TestTCPSockets, TestNotOpen) {
+  std::string buffer;
+  
+  EXPECT_THROW(this->server_->receive_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(this->server_->send_bytes(buffer), exceptions::SocketConfigurationException);
+  
+  EXPECT_THROW(this->client_->receive_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(this->client_->send_bytes(buffer), exceptions::SocketConfigurationException);
 }

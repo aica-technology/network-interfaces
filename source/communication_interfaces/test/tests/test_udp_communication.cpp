@@ -39,8 +39,9 @@ TEST_F(TestUDPSockets, SendReceive) {
 
 TEST_F(TestUDPSockets, Timeout) {
   // Create server socket and bind it to a port
-  this->config_.timeout_duration_sec = 5.0;
+  this->config_.timeout_duration_sec = 3.0;
   sockets::UDPServer server(this->config_);
+  server.open();
 
   // Try to receive a message from client, but expect timeout
   std::string received_bytes;
@@ -58,17 +59,30 @@ TEST_F(TestUDPSockets, PortReuse) {
 }
 
 TEST_F(TestUDPSockets, OpenClose) {
+  std::string buffer;
   // Create and open server socket
+  this->config_.timeout_duration_sec = 0.5;
   sockets::UDPServer server(this->config_);
+  EXPECT_THROW(server.send_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(server.receive_bytes(buffer), exceptions::SocketConfigurationException);
   server.open();
 
+  EXPECT_TRUE(server.send_bytes(std::string("test")));
+  EXPECT_FALSE(server.receive_bytes(buffer));
   // Close server socket
   server.close();
-
-  // Create and open client socket
+  EXPECT_THROW(server.send_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(server.receive_bytes(buffer), exceptions::SocketConfigurationException);
+  
   sockets::UDPClient client(this->config_);
+  EXPECT_THROW(client.send_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(client.receive_bytes(buffer), exceptions::SocketConfigurationException);
   client.open();
 
-  // Try to send a message from the closed server socket (expect failure)
-  EXPECT_FALSE(server.send_bytes(std::string()));
+  EXPECT_TRUE(client.send_bytes(std::string("test")));
+  EXPECT_FALSE(client.receive_bytes(buffer));
+  // Close client socket
+  client.close();
+  EXPECT_THROW(client.send_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(client.receive_bytes(buffer), exceptions::SocketConfigurationException);
 }
