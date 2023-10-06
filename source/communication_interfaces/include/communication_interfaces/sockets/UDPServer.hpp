@@ -15,22 +15,22 @@ public:
    */
   UDPServer(UDPSocketConfiguration configuration);
 
-  /**
-   * @copydoc ISocket::open()
-   */
-  void open() override;
-
-  /**
-   * @copydoc ISocket::receive_bytes(std::string&)
-   */
-  bool receive_bytes(std::string& buffer) override;
-
-  /**
-   * @copydoc ISocket::send_bytes(const std::string&)
-   */
-  bool send_bytes(const std::string& buffer) override;
-
 private:
+  /**
+   * @copydoc ISocket::on_open()
+   */
+  void on_open() override;
+
+  /**
+   * @copydoc ISocket::on_receive_bytes(std::string&)
+   */
+  bool on_receive_bytes(std::string& buffer) override;
+
+  /**
+   * @copydoc ISocket::on_send_bytes(const std::string&)
+   */
+  bool on_send_bytes(const std::string& buffer) override;
+
   sockaddr_in client_address_;
 };
 } // namespace communication_interfaces::sockets

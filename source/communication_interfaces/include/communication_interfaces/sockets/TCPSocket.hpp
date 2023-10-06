@@ -18,23 +18,23 @@ public:
    */
   ~TCPSocket() override;
 
-  /**
-   * @copydoc ISocket::receive_bytes(std::string&)
-   */
-  bool receive_bytes(std::string& buffer) override;
-
-  /**
-   * @copydoc ISocket::receive_bytes(std::string&)
-   */
-  bool send_bytes(const std::string& buffer) override;
-
-  /**
-   * @brief Close the socket
-   */
-  void close() override;
-
 protected:
   explicit TCPSocket(int buffer_size);
+
+  /**
+   * @copydoc ISocket::on_receive_bytes(std::string&)
+   */
+  bool on_receive_bytes(std::string& buffer) override;
+
+  /**
+   * @copydoc ISocket::on_receive_bytes(std::string&)
+   */
+  bool on_send_bytes(const std::string& buffer) override;
+
+  /**
+   * @copydoc ISocket::on_close(std::string&)
+   */
+  void on_close() override;
 
   sockaddr_in server_address_; ///< Address of the TCP server
   int socket_fd_; ///< File descriptor of the socket

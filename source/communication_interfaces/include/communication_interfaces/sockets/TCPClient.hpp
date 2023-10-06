@@ -22,13 +22,13 @@ public:
    */
   explicit TCPClient(TCPClientConfiguration configuration);
 
+private:
   /**
-   * @copydoc ISocket::open()
+   * @copydoc ISocket::on_open()
    * @details Connect the client socket to the server
    */
-  void open() override;
+  void on_open() override;
 
-private:
   TCPClientConfiguration config_; ///< Socket configuration struct
 };
 } // namespace communication_interfaces::sockets

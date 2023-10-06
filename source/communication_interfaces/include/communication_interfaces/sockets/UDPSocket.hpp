@@ -29,11 +29,6 @@ public:
    */
   ~UDPSocket() override;
 
-  /**
-   * @brief Close the socket
-   */
-  void close() override;
-
 protected:
   /**
    * @brief Constructor taking the configuration struct
@@ -62,6 +57,11 @@ protected:
    * @return True if bytes were sent, false otherwise
    */
   [[nodiscard]] bool sendto(const sockaddr_in& address, const std::string& buffer) const;
+
+  /**
+   * @copydoc ISocket::on_close()
+   */
+  void on_close() override;
 
   sockaddr_in server_address_; ///< Address of the UDP server
 

@@ -7,7 +7,7 @@ namespace communication_interfaces::sockets {
 ZMQSocket::ZMQSocket(ZMQSocketConfiguration configuration) : config_(std::move(configuration)) {}
 
 ZMQSocket::~ZMQSocket() {
-  ZMQSocket::close();
+  ZMQSocket::on_close();
 }
 
 void ZMQSocket::open_socket() {
@@ -23,7 +23,7 @@ void ZMQSocket::open_socket() {
   }
 }
 
-bool ZMQSocket::receive_bytes(std::string& buffer) {
+bool ZMQSocket::on_receive_bytes(std::string& buffer) {
   zmq::recv_flags recv_flag = this->config_.wait ? zmq::recv_flags::none : zmq::recv_flags::dontwait;
   zmq::message_t message;
   try {
@@ -37,7 +37,7 @@ bool ZMQSocket::receive_bytes(std::string& buffer) {
   }
 }
 
-bool ZMQSocket::send_bytes(const std::string& buffer) {
+bool ZMQSocket::on_send_bytes(const std::string& buffer) {
   zmq::send_flags send_flags = this->config_.wait ? zmq::send_flags::none : zmq::send_flags::dontwait;
   zmq::message_t msg(buffer.size());
   memcpy(msg.data(), buffer.data(), buffer.size());
@@ -52,7 +52,7 @@ bool ZMQSocket::send_bytes(const std::string& buffer) {
   }
 }
 
-void ZMQSocket::close() {
+void ZMQSocket::on_close() {
   if (this->socket_ != nullptr && this->socket_->connected()) {
     this->socket_->close();
   }

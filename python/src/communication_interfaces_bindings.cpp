@@ -8,19 +8,6 @@
 
 using namespace communication_interfaces;
 
-class PySocket : public sockets::ISocket, public std::enable_shared_from_this<PySocket> {
-public:
-  using sockets::ISocket::ISocket;
-
-  void open() override { PYBIND11_OVERRIDE_PURE(void, ISocket, open, ); }
-
-  bool receive_bytes(std::string& buffer) override { PYBIND11_OVERRIDE_PURE(bool, ISocket, receive_bytes, buffer); }
-
-  bool send_bytes(const std::string& buffer) override { PYBIND11_OVERRIDE_PURE(bool, ISocket, send_bytes, buffer); }
-
-  void close() override { PYBIND11_OVERRIDE(void, ISocket, close, ); }
-};
-
 PYBIND11_MODULE(communication_interfaces, m) {
   m.doc() = "Python bindings for communication interfaces";
 
@@ -36,7 +23,7 @@ PYBIND11_MODULE(communication_interfaces, m) {
 
   auto m_sub_sock = m.def_submodule("sockets", "Submodule for communication interfaces sockets");
 
-  py::class_<sockets::ISocket, std::shared_ptr<sockets::ISocket>, PySocket>(m_sub_sock, "ISocket")
+  py::class_<sockets::ISocket, std::shared_ptr<sockets::ISocket>>(m_sub_sock, "ISocket")
       .def("open", &sockets::ISocket::open, "Perform configuration steps to open the socket for communication")
       .def(
           "receive_bytes",

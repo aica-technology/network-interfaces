@@ -14,10 +14,10 @@ TCPSocket::TCPSocket(int buffer_size) : server_address_(), socket_fd_(), buffer_
 }
 
 TCPSocket::~TCPSocket() {
-  TCPSocket::close();
+  TCPSocket::on_close();
 }
 
-bool TCPSocket::receive_bytes(std::string& buffer) {
+bool TCPSocket::on_receive_bytes(std::string& buffer) {
   std::vector<char> local_buffer(this->buffer_size_);
   auto receive_length = recv(this->socket_fd_, local_buffer.data(), this->buffer_size_, 0);
   if (receive_length < 0) {
@@ -27,12 +27,12 @@ bool TCPSocket::receive_bytes(std::string& buffer) {
   return true;
 }
 
-bool TCPSocket::send_bytes(const std::string& buffer) {
+bool TCPSocket::on_send_bytes(const std::string& buffer) {
   int send_length = send(this->socket_fd_, buffer.data(), buffer.size(), 0);
   return send_length == static_cast<int>(buffer.size());
 }
 
-void TCPSocket::close() {
+void TCPSocket::on_close() {
   ::close(this->socket_fd_);
 }
 } // namespace communication_interfaces::sockets

@@ -15,14 +15,15 @@ public:
    */
   explicit ZMQPublisher(ZMQSocketConfiguration configuration);
 
+private:
   /**
-   * @copydoc ISocket::open()
+   * @copydoc ISocket::on_open()
    */
-  void open() override;
+  void on_open() override;
 
   /**
    * @brief This method throws a runtime error as receiving is not available for a ZMQ publisher
    */
-  bool receive_bytes(std::string& buffer) override;
+  bool on_receive_bytes(std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

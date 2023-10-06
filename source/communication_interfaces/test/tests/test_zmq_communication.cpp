@@ -68,3 +68,15 @@ TEST_F(TestZMQSockets, SendReceiveCombined) {
   server.close();
   client.close();
 }
+
+TEST_F(TestZMQSockets, TestOpenClose) {
+  std::string buffer;
+  sockets::ZMQPublisher socket(this->config_);
+  EXPECT_THROW(socket.send_bytes(buffer), exceptions::SocketConfigurationException);
+  EXPECT_THROW(socket.receive_bytes(buffer), std::runtime_error);
+
+  socket.open();
+  EXPECT_TRUE(socket.send_bytes(std::string("test")));
+  socket.close();
+  EXPECT_THROW(socket.send_bytes(buffer), exceptions::SocketConfigurationException);
+}

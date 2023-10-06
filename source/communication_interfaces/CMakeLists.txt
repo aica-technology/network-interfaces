@@ -52,6 +52,7 @@ if (NOT cppzmq_POPULATED)
 endif()
 
 add_library(${PROJECT_NAME} SHARED
+        ${PROJECT_SOURCE_DIR}/src/sockets/ISocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPSocket.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPClient.cpp
         ${PROJECT_SOURCE_DIR}/src/sockets/UDPServer.cpp

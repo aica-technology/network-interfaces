@@ -36,32 +36,32 @@ public:
    */
   ~ZMQPublisherSubscriber() override;
 
+private:
   /**
    * @brief Open the internal ZMQ Publisher and Subscriber sockets for communication
    * @throws SocketConfigurationException if opening fails
    */
-  void open() override;
+  void on_open() override;
 
   /**
    * @brief Receive bytes from the internal ZMQ Subscriber socket
    * @param buffer The buffer to fill with the received bytes
    * @return True if bytes were received, false otherwise
    */
-  bool receive_bytes(std::string& buffer) override;
+  bool on_receive_bytes(std::string& buffer) override;
 
   /**
    * @brief Send bytes with the internal ZMQ Publisher socket
    * @param buffer The buffer with the bytes to send
    * @return True if bytes were sent, false otherwise
    */
-  bool send_bytes(const std::string& buffer) override;
+  bool on_send_bytes(const std::string& buffer) override;
 
   /**
-   * @brief Close the sockets
+   * @copydoc ISocket::on_close()
    */
-  void close() override;
+  void on_close() override;
 
-private:
   std::shared_ptr<ZMQPublisher> pub_; ///< ZMQ publisher
   std::shared_ptr<ZMQSubscriber> sub_; ///< ZMQ subscriber
 };

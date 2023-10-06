@@ -16,13 +16,13 @@ public:
   explicit ZMQSubscriber(ZMQSocketConfiguration configuration);
 
   /**
-   * @copydoc ISocket::open()
+   * @copydoc ISocket::on_open()
    */
-  void open() override;
+  void on_open() override;
 
   /**
    * @brief This method throws a runtime error as sending is not available for a ZMQ publisher
    */
-  bool send_bytes(const std::string& buffer) override;
+  bool on_send_bytes(const std::string& buffer) override;
 };
 } // namespace communication_interfaces::sockets

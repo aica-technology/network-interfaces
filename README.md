@@ -21,12 +21,12 @@ respectively.
 #### Implementing a derived socket class
 
 To use this class, create a subclass that inherits from it and implement its pure virtual functions. The pure virtual
-functions are `open()`, `receive_bytes(std::string&)`, and `send_bytes(const std::string&)`.
+functions are `on_open()`, `on_receive_bytes(std::string&)`, and `on_send_bytes(const std::string&)`.
 
 Configuration parameters should be passed with a configuration struct, resulting in a single argument constructor.
 
-The `close()` function can optionally be overridden to perform steps to disconnect and close the socket communication.
-If a derived class defines any cleanup behavior in `close()`, it should also be invoked statically and explicitly
+The `on_close()` function can optionally be overridden to perform steps to disconnect and close the socket communication.
+If a derived class defines any cleanup behavior in `on_close()`, it should also be invoked statically and explicitly
 in the destructor of the derived class.
 
 An example is given below.
@@ -45,13 +45,14 @@ public:
   
   ~DerivedSocket() override;
   
-  void open() override;
+private:
+  void on_open() override;
   
-  bool receive_bytes(std::string& buffer) override;
+  bool on_receive_bytes(std::string& buffer) override;
 
-  bool send_bytes(const std::string& buffer) override;
+  bool on_send_bytes(const std::string& buffer) override;
   
-  void close() override;
+  void on_close() override;
 }
 ```
 
@@ -62,24 +63,24 @@ DerivedSocket::DerivedSocket(DerivedSocketConfig configuraiton) {
 }
 
 DerivedSocket::~DerivedSocket() {
-  DerivedSocket::close();
+  DerivedSocket::on_close();
 }
 
-void DerivedSocket::open() {
+void DerivedSocket::on_open() {
   // Configure and open the socket
 }
 
-bool DerivedSocket::receive_bytes(std::string& buffer) {
+bool DerivedSocket::on_receive_bytes(std::string& buffer) {
   // Read the contents of the socket into the buffer and return true on success. Otherwise, return false.
   return true;
 }
 
-bool DerivedSocket::send_bytes(const std::string& buffer) {
+bool DerivedSocket::on_send_bytes(const std::string& buffer) {
   // Write the contents of the buffer onto the socket and return true on success. Otherwise, return false.
   return true;
 }
 
-void DerivedSocket::close() {
+void DerivedSocket::on_close() {
   // Perform clean-up steps here
 }
 ```

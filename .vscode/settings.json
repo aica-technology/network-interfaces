@@ -1,0 +1,5 @@
+{
+    "cmake.sourceDirectory": "/home/ros2/.devcontainer/source/communication_interfaces",
+    "cmake.configureArgs": [ "-DBUILD_TESTING=ON" ],
+    "C_Cpp.clang_format_style": "file:/home/ros2/.clang-format"
+}
