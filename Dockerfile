@@ -80,8 +80,7 @@ COPY --from=install /tmp/communication-interfaces /usr
 COPY --chown=${USER}:${USER} ./python /python
 RUN --mount=type=cache,target=${HOME}/.cache,id=pip-${TARGETPLATFORM}-${CACHEID},uid=1000 \
   python3 -m pip install --prefix=/tmp/python /python
-RUN mkdir -p /tmp/python-home/${USER}/.local/lib/python3.10/ \
-  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${USER}/.local/lib/python3.10/site-packages/
+RUN mv /tmp/python/local /tmp/python-usr
 
 FROM build as test
 ARG TARGETPLATFORM
@@ -89,7 +88,7 @@ ARG CACHEID
 RUN --mount=type=cache,target=./build,id=cmake-${TARGETPLATFORM}-${CACHEID},uid=1000 \
   cmake -B build -DBUILD_TESTING=ON && cd build && make && CTEST_OUTPUT_ON_FAILURE=1 make test
 COPY --from=install /tmp/communication-interfaces /usr/local
-COPY --from=python /tmp/python-home/ /home
+COPY --from=python /tmp/python-usr /usr
 COPY --from=python /python/test /python/test
 RUN python3 -m pytest /python/test --verbose
 
@@ -98,7 +97,7 @@ ARG TARGETPLATFORM
 ARG CACHEID
 COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/communication-interfaces /usr
-COPY --from=python /tmp/python-home /home
+COPY --from=python /tmp/python-usr /usr
 RUN sudo pip install pybind11-stubgen
 RUN --mount=type=cache,target=${HOME}/.cache,id=pip-${TARGETPLATFORM}-${CACHEID},uid=1000 \
 <<HEREDOC
@@ -125,11 +124,10 @@ EoF
   rm -r ./stubs
 fi
 HEREDOC
-RUN mkdir -p /tmp/python-home/${USER}/.local/lib/python3.10/ \
-  && mv /tmp/python/local/lib/python3.10/dist-packages/ /tmp/python-home/${USER}/.local/lib/python3.10/site-packages/
+RUN mv /tmp/python/local /tmp/python-usr
 
 FROM scratch as production
 COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/communication-interfaces /usr/local
-COPY --from=python /tmp/python-home/ /home
-COPY --from=python-stubs /tmp/python-home /home
+COPY --from=python /tmp/python-usr /usr
+COPY --from=python-stubs /tmp/python-usr /usr
