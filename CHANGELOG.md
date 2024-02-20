@@ -15,6 +15,7 @@ Release Versions:
 
 ## Upcoming changes (in development)
 
+- build: copy python packages into /usr instead of ~ros2 to avoid permission issues (#69)
 - feat: add is_opened flag to socket base class (#68)
 
 ## 2.0.1
