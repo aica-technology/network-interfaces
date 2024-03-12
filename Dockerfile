@@ -1,5 +1,5 @@
-ARG ROS2_VERSION=humble
-FROM ghcr.io/aica-technology/ros2-ws:humble as base
+ARG ROS2_VERSION=iron
+FROM ghcr.io/aica-technology/ros2-ws:${ROS2_VERSION} as base
 USER ${USER}
 
 FROM base as apt-dependencies
@@ -128,6 +128,6 @@ RUN mv /tmp/python/local /tmp/python-usr
 
 FROM scratch as production
 COPY --from=apt-dependencies /tmp/apt /
-COPY --from=install /tmp/communication-interfaces /usr/local
+COPY --from=install /tmp/communication-interfaces /usr
 COPY --from=python /tmp/python-usr /usr
 COPY --from=python-stubs /tmp/python-usr /usr

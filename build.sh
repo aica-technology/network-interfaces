@@ -3,7 +3,7 @@
 IMAGE_NAME=ghcr.io/aica-technology/network-interfaces
 IMAGE_TAG=latest
 
-ROS2_VERSION=humble
+ROS2_VERSION=iron
 
 HELP_MESSAGE="Usage: build.sh [options]
 Options:
