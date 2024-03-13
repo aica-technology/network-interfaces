@@ -146,4 +146,4 @@ Here we expect the printed value to be `Hello!`, however due to the way strings 
 print(received_str_msg.decode("utf-8")) # will print Hello! as expected
 ```
 
-However, due to the different ways each communication protocol transmits data, there is no general method to ensure the data is correct, and this responsibility is left to the user to sanitize the data correctly. For other examples, check `python/test`.
+More examples can be found [in the Python unit tests](./python/test).
