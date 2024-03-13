@@ -117,3 +117,33 @@ of the binding sockets. For example, if the containers are running on network *a
 - This list of combinations is not exhaustive.
 - The binding sockets always have a URI like `*:port` whilst the connecting sockets need to provide the complete address
   version (`0.0.0.0:port` if on localhost or `hostname.network:port` if on bridge network).
+
+### Note on the Python bindings
+
+The Python bindings require an additional step of sanitizing the data when sending and receiving bytes. To illustrate this, an example is provided here.
+
+```python
+# First a server and a client is connected
+context = ZMQContext()
+server = ZMQPublisher(ZMQSocketConfiguration(context, "127.0.0.1", "5001", True))
+client = ZMQSubscriber(ZMQSocketConfiguration(context, "127.0.0.1", "5001", False))
+server.open()
+client.open()
+```
+
+```python
+# Then a string is sent through
+str_msg = "Hello!"
+server.send_bytes(str_msg)
+received_str_msg = client.receive_bytes()
+if received_str_msg is not None:
+    print(received_str_msg)
+```
+Here we expect the printed value to be `Hello!`, however due to the way strings and bytes are processed, the string message is left as a byte literal and `b'Hello!'` is printed instead. We can correct this as follows:
+
+```python
+# Instead, decode the value
+print(received_str_msg.decode("utf-8")) # will print Hello! as expected
+```
+
+More examples can be found [in the Python unit tests](./python/test).
