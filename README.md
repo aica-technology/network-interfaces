@@ -118,9 +118,9 @@ of the binding sockets. For example, if the containers are running on network *a
 - The binding sockets always have a URI like `*:port` whilst the connecting sockets need to provide the complete address
   version (`0.0.0.0:port` if on localhost or `hostname.network:port` if on bridge network).
 
-### Note on python bindings
+### Note on the Python bindings
 
-The python bindings require an additional step of sanitizing the data when sending and receiving bytes. To illustrate this, an example code is provided here.
+The Python bindings require an additional step of sanitizing the data when sending and receiving bytes. To illustrate this, an example is provided here.
 
 ```python
 # First a server and a client is connected
