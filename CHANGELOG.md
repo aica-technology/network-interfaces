@@ -2,6 +2,7 @@
 
 Release Versions:
 
+- [2.0.2](#202)
 - [2.0.1](#201)
 - [2.0.0](#200)
 - [1.4.1](#141)
@@ -12,6 +13,11 @@ Release Versions:
 - [1.0.0](#100)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 2.0.2
+
+Version 2.0.2 is a retro-active patch that adds metadata to the network-interfaces Docker image required for
+aica-technology/package-builder:v1.
 
 ## 2.0.1
 
