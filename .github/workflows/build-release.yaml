@@ -19,7 +19,7 @@ jobs:
         id: parse-tag
 
   build:
-    needs: [ get-tag ]
+    needs: [get-tag]
     strategy:
       matrix:
         arch: [amd64, arm64]
@@ -42,13 +42,14 @@ jobs:
         with:
           image_name: aica-technology/network-interfaces
           image_tags: ${{ steps.merge-tags.outputs.list }}
+          build_flags: --build-arg VERSION=${{ needs.get-tag.outputs.tag }}
           dockerfile_path: Dockerfile
           token: ${{ secrets.GITHUB_TOKEN }}
 
   multi-arch:
     runs-on: ubuntu-latest
     name: Merge into a multi-arch image
-    needs: [ get-tag, build ]
+    needs: [get-tag, build]
     steps:
       - uses: aica-technology/.github/.github/actions/ghcr-manifest-merge@v0.6.1
         with:

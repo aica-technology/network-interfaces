@@ -1,5 +1,5 @@
-ARG ROS2_VERSION=humble
-FROM ghcr.io/aica-technology/ros2-ws:humble as base
+ARG ROS2_VERSION=v1.0.1-iron
+FROM ghcr.io/aica-technology/ros2-ws:${ROS2_VERSION} as base
 USER ${USER}
 
 FROM base as apt-dependencies
@@ -133,3 +133,10 @@ COPY --from=apt-dependencies /tmp/apt /
 COPY --from=install /tmp/communication-interfaces /usr/local
 COPY --from=python /tmp/python-home/ /home
 COPY --from=python-stubs /tmp/python-home /home
+
+ARG VERSION
+ARG ROS2_VERSION
+LABEL org.opencontainers.image.title="AICA network-interfaces library"
+LABEL org.opencontainers.image.description="AICA network-interfaces library (for ${ROS2_VERSION})"
+LABEL org.opencontainers.image.version="${VERSION}"
+LABEL tech.aica.image.metadata='{"type":"lib","base":{"name":"@aica/foss/ros2-ws","version":"'${ROS2_VERSION}'"}}'
